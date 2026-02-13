@@ -1,4 +1,4 @@
 #include "note.h""
-Note::getFullPath(){
+/*Note::getFullPath(){
 
-};
+};*/
