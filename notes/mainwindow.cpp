@@ -20,17 +20,15 @@ class Note{
 };
 
 void MainWindow::on_openFile_triggered(){
-    QString filter = "Pliki tekstowe (*.txt)";
-    QString fileName = QFileDialog::getOpenFileName(this, "Otwórz plik",QDir::homePath(), filter);
-    QFile file(fileName);
+    QString filePath = FileHandling::getOpenFilePath(this);
 
-    if(!file.open(QFile::ReadOnly | QFile::Text)){
-        // Obsługa błędów
-        return;
+    // Obsługa błędów
+    if(filePath.isEmpty()) return;
+
+    // Wyświetlanie zawartości
+    QString content = FileHandling::openFile(filePath);
+    if(!content.isNull()){
+        ui->noteText->setText(content);
+        currentFilePath = filePath;
     }
-
-    QTextStream text(&file);
-    QString fileContent = text.readAll();
-    ui->noteText->setText(fileContent);
 }
-
