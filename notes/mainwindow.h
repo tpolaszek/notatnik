@@ -22,6 +22,8 @@ public:
 private slots:
     void on_openFile_triggered();
 
+    void on_createFile_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentFilePath;

@@ -41,3 +41,11 @@ void MainWindow::on_openFile_triggered(){
         setTitle(filePath);
     }
 }
+
+void MainWindow::on_createFile_triggered(){
+    // Resetuje widok aplikacji de facto plik będzie tworzony przy zapisie pliku
+    ui->noteText->clear();
+    currentFilePath = QString();
+    this->setWindowTitle("Notatnik");
+}
+

@@ -64,8 +64,10 @@
     <property name="title">
      <string>Plik</string>
     </property>
+    <addaction name="createFile"/>
     <addaction name="openFile"/>
     <addaction name="openedRecently"/>
+    <addaction name="separator"/>
     <addaction name="saveFile"/>
     <addaction name="saveFileAs"/>
     <addaction name="print"/>
@@ -131,6 +133,11 @@
   <action name="actionUstawienia">
    <property name="text">
     <string>Ustawienia</string>
+   </property>
+  </action>
+  <action name="createFile">
+   <property name="text">
+    <string>Utwórz plik</string>
    </property>
   </action>
  </widget>
