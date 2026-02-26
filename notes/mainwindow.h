@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    void setTitle(QString title);
 
 private slots:
     void on_openFile_triggered();
