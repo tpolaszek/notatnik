@@ -24,6 +24,10 @@ private slots:
 
     void on_createFile_triggered();
 
+    void on_saveFile_triggered();
+
+    void on_saveFileAs_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentFilePath;

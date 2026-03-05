@@ -49,3 +49,45 @@ void MainWindow::on_createFile_triggered(){
     this->setWindowTitle("Notatnik");
 }
 
+// Otwieramy okno systemowe tylko jeśli nie zostało wcześniej nazwane
+void MainWindow::on_saveFile_triggered()
+{
+    // Jeśli plik nie ma nazwy to wywołujemy funkcję zapisz jako
+    if(currentFilePath.isEmpty()) {
+        on_saveFileAs_triggered();
+    } else {
+        QFile file(currentFilePath);
+
+        if(file.open(QFile::WriteOnly | QFile::Text)) {
+            QTextStream out(&file);
+            out << ui->noteText->toPlainText();
+            file.close();
+
+            setTitle(currentFilePath);
+        }
+    }
+}
+
+// Zawsze otwieramy okno systemowe
+void MainWindow::on_saveFileAs_triggered()
+{
+
+    // Funkcja która otwiera okno systemowe
+    QString fileName = QFileDialog::getSaveFileName(this, "Zapisz jako", "", "Pliki tekstowe (*.txt);;Wszystkie pliki (*)");
+
+    // Zabezpieczenie przed wciśnięciem anuluj
+    if(!fileName.isEmpty()) {
+        currentFilePath = fileName;
+
+        // Tworzenie ficzynie pliku na dysku
+        QFile file(fileName);
+
+        if(file.open(QFile::WriteOnly | QFile::Text)) {
+            QTextStream out(&file);
+            out << ui->noteText->toPlainText();
+            file.close();
+        }
+
+    }
+}
+
