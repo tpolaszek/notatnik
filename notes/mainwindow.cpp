@@ -62,8 +62,6 @@ void MainWindow::on_saveFile_triggered()
             QTextStream out(&file);
             out << ui->noteText->toPlainText();
             file.close();
-
-            setTitle(currentFilePath);
         }
     }
 }
@@ -85,6 +83,7 @@ void MainWindow::on_saveFileAs_triggered()
         if(file.open(QFile::WriteOnly | QFile::Text)) {
             QTextStream out(&file);
             out << ui->noteText->toPlainText();
+            setTitle(currentFilePath);
             file.close();
         }
 
