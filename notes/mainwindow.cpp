@@ -1,16 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
-
+#include <QScrollBar>
+#include <QInputDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    // Ustawienie domyślnej nazwy okienka jako notatnik przy tworzeniu obiektu
     this->setWindowTitle("Notatnik");
+    ustawLicznikWierszy();
 }
 
 MainWindow::~MainWindow()
@@ -87,6 +88,97 @@ void MainWindow::on_saveFileAs_triggered()
             file.close();
         }
 
+    }
+}
+
+void MainWindow::ustawLicznikWierszy()
+{
+    // Konfiguracja panelu
+    ui->licznikWierszy->setReadOnly(true);
+    ui->licznikWierszy->setFocusPolicy(Qt::NoFocus);
+    ui->licznikWierszy->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->licznikWierszy->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // Połączenie: przy zmianie tekstu wywołaj odświeżanie
+    connect(ui->noteText, &QTextEdit::textChanged, this, [=]() {
+        QString numery;
+        int iloscLinii = ui->noteText->document()->blockCount();
+
+        for (int i = 1; i <= iloscLinii; ++i) {
+            numery += QString::number(i) + "\n";
+        }
+
+        ui->licznikWierszy->setPlainText(numery);
+
+        // Wyrównanie bez podświetlenia
+        QTextCursor cursor = ui->licznikWierszy->textCursor();
+        cursor.select(QTextCursor::Document);
+        QTextBlockFormat format;
+        format.setAlignment(Qt::AlignRight);
+        cursor.mergeBlockFormat(format);
+        cursor.clearSelection();
+        ui->licznikWierszy->setTextCursor(cursor);
+
+        // Synchronizacja suwaka (przy pisaniu)
+        ui->licznikWierszy->verticalScrollBar()->setValue(ui->noteText->verticalScrollBar()->value());
+    });
+
+    // Połączenie: przy przewijaniu
+    connect(ui->noteText->verticalScrollBar(), &QScrollBar::valueChanged, this, [=](int value) {
+        ui->licznikWierszy->verticalScrollBar()->setValue(value);
+    });
+}
+
+
+void MainWindow::on_actionZnajdz_triggered()
+{
+    static QString word;
+    bool ok = true;
+
+    // Pętla sprawia, że okno nie znika "na zawsze" po kliknięciu OK
+    while (ok) {
+        word = QInputDialog::getText(this, "Znajdź (Enter = Następny)", "Szukaj:", QLineEdit::Normal, word, &ok);
+
+        if (!ok || word.isEmpty()) break;
+
+        // 1. Szukanie (jeśli koniec, leć od początku)
+        if (!ui->noteText->find(word)) {
+            ui->noteText->moveCursor(QTextCursor::Start);
+            ui->noteText->find(word);
+        }
+
+        // 2. Licznik (krótka wersja)
+        QString content = ui->noteText->toPlainText();
+        int total = content.count(word, Qt::CaseInsensitive);
+        int current = content.left(ui->noteText->textCursor().selectionEnd()).count(word, Qt::CaseInsensitive);
+
+        // 3. Status
+        this->statusBar()->showMessage(QString("Wynik: %1 / %2").arg(current).arg(total));
+    }
+}
+
+void MainWindow::on_actionZnajdz_i_zamien_triggered()
+{
+    bool ok1, ok2;
+    // 1. Pytamy o słowo do znalezienia
+    QString searchWord = QInputDialog::getText(this, "Zamień", "Znajdź:", QLineEdit::Normal, "", &ok1);
+
+    if (ok1 && !searchWord.isEmpty()) {
+        // 2. Pytamy o nowe słowo
+        QString replaceWord = QInputDialog::getText(this, "Zamień", "Zamień na:", QLineEdit::Normal, "", &ok2);
+
+        if (ok2) {
+            // 3. Pobieramy cały tekst z notatnika
+            QString content = ui->noteText->toPlainText();
+
+            // 4. Wykonujemy zamianę wszystkich wystąpień
+            if (content.contains(searchWord)) {
+                content.replace(searchWord, replaceWord);
+                ui->noteText->setPlainText(content);
+            } else {
+                QMessageBox::information(this, "Info", "Nie znaleziono słowa do zamiany.");
+            }
+        }
     }
 }
 

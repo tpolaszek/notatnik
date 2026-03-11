@@ -23,7 +23,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -39,6 +39,19 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QTextEdit" name="licznikWierszy">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>30</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QTextEdit" name="noteText">
       <property name="sizePolicy">
@@ -57,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOtw_rz_plik">
@@ -81,8 +94,16 @@
     </property>
     <addaction name="actionUstawienia"/>
    </widget>
+   <widget class="QMenu" name="menuNarz_dzia">
+    <property name="title">
+     <string>Narzędzia</string>
+    </property>
+    <addaction name="actionZnajdz"/>
+    <addaction name="actionZnajdz_i_zamien"/>
+   </widget>
    <addaction name="menuOtw_rz_plik"/>
    <addaction name="menuUstawienia"/>
+   <addaction name="menuNarz_dzia"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openFile">
@@ -140,7 +161,27 @@
     <string>Utwórz plik</string>
    </property>
   </action>
+  <action name="actionZnajdz">
+   <property name="text">
+    <string>Znajdź</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionZnajdz_i_zamien">
+   <property name="text">
+    <string>Znajdź i zamień</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>noteText</tabstop>
+  <tabstop>licznikWierszy</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
