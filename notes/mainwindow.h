@@ -28,12 +28,6 @@ private slots:
 
     void on_saveFileAs_triggered();
 
-    void on_actionZnajdz_triggered();
-
-    void on_actionZnajdz_i_zamien_triggered();
-
-    void ustawLicznikWierszy();
-
 private:
     Ui::MainWindow *ui;
     QString currentFilePath;

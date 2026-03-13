@@ -11,11 +11,13 @@ CONFIG += c++17
 SOURCES += \
     filehandling.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    texttools.cpp
 
 HEADERS += \
     filehandling.h \
-    mainwindow.h
+    mainwindow.h \
+    texttools.h
 
 FORMS += \
     mainwindow.ui

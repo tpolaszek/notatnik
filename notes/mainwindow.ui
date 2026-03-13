@@ -40,7 +40,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTextEdit" name="licznikWierszy">
+     <widget class="QTextEdit" name="lineCounter">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -98,7 +98,7 @@
     <property name="title">
      <string>Narzędzia</string>
     </property>
-    <addaction name="actionZnajdz"/>
+    <addaction name="actionFind"/>
     <addaction name="actionZnajdz_i_zamien"/>
    </widget>
    <addaction name="menuOtw_rz_plik"/>
@@ -161,7 +161,7 @@
     <string>Utwórz plik</string>
    </property>
   </action>
-  <action name="actionZnajdz">
+  <action name="actionFind">
    <property name="text">
     <string>Znajdź</string>
    </property>
@@ -180,7 +180,7 @@
  </widget>
  <tabstops>
   <tabstop>noteText</tabstop>
-  <tabstop>licznikWierszy</tabstop>
+  <tabstop>lineCounter</tabstop>
  </tabstops>
  <resources/>
  <connections/>
