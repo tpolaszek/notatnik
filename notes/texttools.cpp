@@ -1,7 +1,7 @@
 #include "texttools.h"
 #include <QScrollBar>
 
-void TextTools::setupLineCounterUI(QTextEdit *editor, QTextEdit *lineCounter) {
+void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
     lineCounter->setReadOnly(true);                // Tylko do odczytu
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Ukryj suwak
 
@@ -15,7 +15,7 @@ void TextTools::setupLineCounterUI(QTextEdit *editor, QTextEdit *lineCounter) {
                      lineCounter->verticalScrollBar(), &QScrollBar::setValue);
 }
 
-void TextTools::updateLineCounter(QTextEdit *editor, QTextEdit *lineCounter) {
+void TextTools::updateLineCounter(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
     int lineCount = editor->document()->blockCount();
     QString lineNumbers;
     for(int i = 1; i<= lineCount; i++) {

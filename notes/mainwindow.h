@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <filehandling.h>
+#include "filehandling.h"
+#include "grammarloader.h"
+#include "syntaxhighlighter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,16 +23,17 @@ public:
 
 private slots:
     void on_openFile_triggered();
-
     void on_createFile_triggered();
-
     void on_saveFile_triggered();
-
     void on_saveFileAs_triggered();
 
 private:
-    Ui::MainWindow *ui;
+    void applyHighlighter(const QString& filePath);
+
+    Ui::MainWindow* ui;
     QString currentFilePath;
+    SyntaxHighlighter* currentHighlighter;
+    GrammarLoader grammarLoader;
 };
 
 #endif // MAINWINDOW_H

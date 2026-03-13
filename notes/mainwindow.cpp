@@ -2,69 +2,86 @@
 #include "ui_mainwindow.h"
 #include "texttools.h"
 #include <QFileDialog>
+#include <QTextStream>
+#include <QFileInfo>
+#include <QStandardPaths>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , currentHighlighter(nullptr)
 {
     ui->setupUi(this);
     this->setWindowTitle("Notatnik");
 
-    // Ustawiam wygląd licznika
     TextTools::setupLineCounterUI(ui->noteText, ui->lineCounter);
-
-    // Za każdym razem, gdy zmienisz tekst w noteText, wywoła się updateLineCounter
-    connect(ui->noteText, &QTextEdit::textChanged, this, [this]() {
+    connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
     });
+
+    // Load built-in grammars from resources, then user grammars on top
+    grammarLoader.loadFromDirectory(QDir::currentPath() + "/syntax");
+    qDebug() << "Looking for grammars in:" << QDir::currentPath() + "/syntax";
+    qDebug() << "Languages found:" << grammarLoader.availableLanguages();
 }
 
 MainWindow::~MainWindow()
 {
+    delete currentHighlighter;
     delete ui;
 }
 
 void MainWindow::setTitle(QString title){
-    // Obsługa błędów
     if(title.isEmpty()) return;
-
-    // Ustawienie nazwy okna na lokalizacje pliku np: "C:/Users/qwerty/notatka.txt - Notatnik"
     this->setWindowTitle(title + " - Notatnik");
 }
 
+void MainWindow::applyHighlighter(const QString& filePath)
+{
+    delete currentHighlighter;
+    currentHighlighter = nullptr;
 
-void MainWindow::on_openFile_triggered(){
-    QString filePath = FileHandling::getOpenFilePath(this);
+    QFileInfo info(filePath);
+    QString ext = info.suffix().toLower();
 
-    // Obsługa błędów
-    if(filePath.isEmpty()) return;
-
-    // Wyświetlanie zawartości
-    QString content = FileHandling::openFile(filePath);
-    if(!content.isNull()){
-        ui->noteText->setText(content);
-        currentFilePath = filePath;
-        setTitle(filePath);
+    QJsonObject grammar = grammarLoader.grammarForExtension(ext);
+    if(!grammar.isEmpty()){
+        currentHighlighter = new SyntaxHighlighter(ui->noteText->document());
+        currentHighlighter->loadFromJson(grammar);
     }
 }
 
-void MainWindow::on_createFile_triggered(){
-    // Resetuje widok aplikacji de facto plik będzie tworzony przy zapisie pliku
+void MainWindow::on_openFile_triggered()
+{
+    QString filePath = FileHandling::getOpenFilePath(this);
+    if(filePath.isEmpty()) return;
+
+    QString content = FileHandling::openFile(filePath);
+    if(!content.isNull()){
+        ui->noteText->setPlainText(content);
+        currentFilePath = filePath;
+        setTitle(filePath);
+        applyHighlighter(filePath);
+    }
+}
+
+void MainWindow::on_createFile_triggered()
+{
+    delete currentHighlighter;
+    currentHighlighter = nullptr;
+
     ui->noteText->clear();
     currentFilePath = QString();
     this->setWindowTitle("Notatnik");
 }
 
-// Otwieramy okno systemowe tylko jeśli nie zostało wcześniej nazwane
 void MainWindow::on_saveFile_triggered()
 {
-    // Jeśli plik nie ma nazwy to wywołujemy funkcję zapisz jako
-    if(currentFilePath.isEmpty()) {
+    if(currentFilePath.isEmpty()){
         on_saveFileAs_triggered();
     } else {
         QFile file(currentFilePath);
-
-        if(file.open(QFile::WriteOnly | QFile::Text)) {
+        if(file.open(QFile::WriteOnly | QFile::Text)){
             QTextStream out(&file);
             out << ui->noteText->toPlainText();
             file.close();
@@ -72,27 +89,22 @@ void MainWindow::on_saveFile_triggered()
     }
 }
 
-// Zawsze otwieramy okno systemowe
 void MainWindow::on_saveFileAs_triggered()
 {
-
-    // Funkcja która otwiera okno systemowe
     QString fileName = QFileDialog::getSaveFileName(this, "Zapisz jako", "", "Pliki tekstowe (*.txt);;Wszystkie pliki (*)");
 
-    // Zabezpieczenie przed wciśnięciem anuluj
-    if(!fileName.isEmpty()) {
+    if(!fileName.isEmpty()){
         currentFilePath = fileName;
 
-        // Tworzenie ficzynie pliku na dysku
         QFile file(fileName);
-
-        if(file.open(QFile::WriteOnly | QFile::Text)) {
+        if(file.open(QFile::WriteOnly | QFile::Text)){
             QTextStream out(&file);
             out << ui->noteText->toPlainText();
             setTitle(currentFilePath);
             file.close();
-        }
 
+            // Re-apply since extension may have changed
+            applyHighlighter(currentFilePath);
+        }
     }
 }
-

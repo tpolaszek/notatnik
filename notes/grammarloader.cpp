@@ -12,7 +12,7 @@ void GrammarLoader::loadFromDirectory(const QString& dirPath) {
         QFile file(dir.filePath(fileName));
         if(!file.open(QFile::ReadOnly)) continue;
 
-        QJsonDocument doc = QJsonDocument.fromJson(file.readAll());
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         if(doc.isNull()) continue;
 
         QJsonObject grammar = doc.object();

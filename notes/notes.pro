@@ -10,13 +10,17 @@ CONFIG += c++17
 
 SOURCES += \
     filehandling.cpp \
+    grammarloader.cpp \
     main.cpp \
     mainwindow.cpp \
+    syntaxhighlighter.cpp \
     texttools.cpp
 
 HEADERS += \
     filehandling.h \
+    grammarloader.h \
     mainwindow.h \
+    syntaxhighlighter.h \
     texttools.h
 
 FORMS += \
