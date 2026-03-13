@@ -19,10 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
     });
 
-    // Load built-in grammars from resources, then user grammars on top
     grammarLoader.loadFromDirectory(QDir::currentPath() + "/syntax");
-    qDebug() << "Looking for grammars in:" << QDir::currentPath() + "/syntax";
-    qDebug() << "Languages found:" << grammarLoader.availableLanguages();
 }
 
 MainWindow::~MainWindow()
