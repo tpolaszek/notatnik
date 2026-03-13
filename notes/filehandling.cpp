@@ -19,5 +19,5 @@ QString FileHandling::openFile(const QString &filePath) {
 
 // Metoda pobiera ścieżkę otwartego pliku
 QString FileHandling::getOpenFilePath(QWidget *parent){
-    return QFileDialog::getOpenFileName(parent, "Otwórz plik",QDir::homePath(), "Pliki tekstowe (*.txt)"/* miejsce na rozbudowe wspieranie inntcg plików*/);
+    return QFileDialog::getOpenFileName(parent, "Otwórz plik",QDir::homePath(), "Pliki tekstowe (*.txt);; HTML (*.html)"/* miejsce na rozbudowe wspieranie inntcg plików*/);
 }
