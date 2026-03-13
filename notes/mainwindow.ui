@@ -46,7 +46,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>30</width>
+        <width>35</width>
         <height>16777215</height>
        </size>
       </property>
@@ -99,7 +99,7 @@
      <string>Narzędzia</string>
     </property>
     <addaction name="actionFind"/>
-    <addaction name="actionZnajdz_i_zamien"/>
+    <addaction name="actionFindAndReplace"/>
    </widget>
    <addaction name="menuOtw_rz_plik"/>
    <addaction name="menuUstawienia"/>
@@ -169,7 +169,7 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionZnajdz_i_zamien">
+  <action name="actionFindAndReplace">
    <property name="text">
     <string>Znajdź i zamień</string>
    </property>

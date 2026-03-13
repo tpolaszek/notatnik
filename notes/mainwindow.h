@@ -28,9 +28,12 @@ private slots:
 
     void on_saveFileAs_triggered();
 
+    void on_actionFind_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentFilePath;
+    QString lastSearchTerm;
 };
 
 #endif // MAINWINDOW_H
