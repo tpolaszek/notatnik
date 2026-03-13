@@ -10,12 +10,16 @@ CONFIG += c++17
 
 SOURCES += \
     filehandling.cpp \
+    grammarloader.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    syntaxhighlighter.cpp
 
 HEADERS += \
     filehandling.h \
-    mainwindow.h
+    grammarloader.h \
+    mainwindow.h \
+    syntaxhighlighter.h
 
 FORMS += \
     mainwindow.ui

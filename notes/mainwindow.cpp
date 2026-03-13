@@ -4,6 +4,7 @@
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <grammarloader.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -37,7 +38,7 @@ void MainWindow::on_openFile_triggered(){
     // Wyświetlanie zawartości
     QString content = FileHandling::openFile(filePath);
     if(!content.isNull()){
-        ui->noteText->setText(content);
+        ui->noteText->setPlainText(content);
         currentFilePath = filePath;
         setTitle(filePath);
     }
@@ -181,4 +182,3 @@ void MainWindow::on_actionZnajdz_i_zamien_triggered()
         }
     }
 }
-
