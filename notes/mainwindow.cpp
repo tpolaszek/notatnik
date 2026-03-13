@@ -5,6 +5,8 @@
 #include <QTextStream>
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QInputDialog>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -105,3 +107,17 @@ void MainWindow::on_saveFileAs_triggered()
         }
     }
 }
+
+void MainWindow::on_actionFind_triggered()
+{
+    bool isConfirmed;
+
+    // Pobieramy tekst od użytkownika
+    QString searchTerm = QInputDialog::getText(this, "Search", "Find what:", QLineEdit::Normal, lastSearchTerm, &isConfirmed);
+
+    // Sprawdzamy, czy użytkownik zatwierdził (OK) i czy wpisał cokolwiek
+    if (isConfirmed && !searchTerm.isEmpty()) {
+        TextTools::findText(this, ui->noteText, searchTerm);
+    }
+}
+>>>>>>> tools

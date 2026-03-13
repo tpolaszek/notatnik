@@ -27,13 +27,19 @@ private slots:
     void on_saveFile_triggered();
     void on_saveFileAs_triggered();
 
+    void on_actionFind_triggered();
+
 private:
     void applyHighlighter(const QString& filePath);
 
     Ui::MainWindow* ui;
     QString currentFilePath;
+<<<<<<< HEAD
     SyntaxHighlighter* currentHighlighter;
     GrammarLoader grammarLoader;
+=======
+    QString lastSearchTerm;
+>>>>>>> tools
 };
 
 #endif // MAINWINDOW_H
