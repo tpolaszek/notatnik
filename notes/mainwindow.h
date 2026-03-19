@@ -34,12 +34,11 @@ private:
 
     Ui::MainWindow* ui;
     QString currentFilePath;
-<<<<<<< HEAD
+
     SyntaxHighlighter* currentHighlighter;
     GrammarLoader grammarLoader;
-=======
     QString lastSearchTerm;
->>>>>>> tools
+
 };
 
 #endif // MAINWINDOW_H

@@ -16,21 +16,17 @@ void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineC
                      lineCounter->verticalScrollBar(), &QScrollBar::setValue);
 }
 
-<<<<<<< HEAD
+
 void TextTools::updateLineCounter(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
-    int lineCount = editor->document()->blockCount();
-=======
-void TextTools::updateLineCounter(QTextEdit *editor, QTextEdit *lineCounter) {
     int totalLines = editor->document()->blockCount();
     applyDynamicWidth(totalLines, lineCounter);
->>>>>>> tools
     QString lineNumbers;
     for(int i = 1; i<= totalLines; i++) {
         lineNumbers += QString::number(i) + "\n";
     }
     lineCounter->setPlainText(lineNumbers);
 }
-void TextTools::applyDynamicWidth(int totalLines, QTextEdit *lineCounter) {
+void TextTools::applyDynamicWidth(int totalLines, QPlainTextEdit *lineCounter) {
     if (totalLines >= 1000) {
         lineCounter->setFixedWidth(45);
     } else {
@@ -38,7 +34,7 @@ void TextTools::applyDynamicWidth(int totalLines, QTextEdit *lineCounter) {
     }
 }
 
-void TextTools::findText(QMainWindow *parent, QTextEdit *editor, QString &lastSearch) {
+void TextTools::findText(QMainWindow *parent, QPlainTextEdit *editor, QString &lastSearch) {
     if (lastSearch.isEmpty()) return;
 
     // Próbujemy znaleźć tekst od aktualnej pozycji kursora
@@ -60,9 +56,3 @@ void TextTools::findText(QMainWindow *parent, QTextEdit *editor, QString &lastSe
 
 
 
-
-
-
-//TextTools::findText(QMainWindow *parent, QTextEdit *editor, QString &lastSearch) {
-
-//}

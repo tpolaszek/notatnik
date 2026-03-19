@@ -120,4 +120,4 @@ void MainWindow::on_actionFind_triggered()
         TextTools::findText(this, ui->noteText, searchTerm);
     }
 }
->>>>>>> tools
+
