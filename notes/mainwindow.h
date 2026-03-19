@@ -29,6 +29,8 @@ private slots:
 
     void on_actionFind_triggered();
 
+    void on_actionFindAndReplace_triggered();
+
 private:
     void applyHighlighter(const QString& filePath);
 
