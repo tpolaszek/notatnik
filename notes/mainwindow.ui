@@ -92,7 +92,7 @@
     <property name="title">
      <string>Preferencje</string>
     </property>
-    <addaction name="actionUstawienia"/>
+    <addaction name="settings"/>
    </widget>
    <widget class="QMenu" name="menuNarz_dzia">
     <property name="title">
@@ -151,7 +151,7 @@
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="actionUstawienia">
+  <action name="settings">
    <property name="text">
     <string>Ustawienia</string>
    </property>

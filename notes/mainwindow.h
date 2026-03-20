@@ -5,6 +5,8 @@
 #include "filehandling.h"
 #include "grammarloader.h"
 #include "syntaxhighlighter.h"
+#include "settingsmanager.h"
+#include "settingsdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -29,12 +31,15 @@ private slots:
 
     void on_actionFind_triggered();
 
+    void on_settings_triggered();
+
 private:
     void applyHighlighter(const QString& filePath);
 
     Ui::MainWindow* ui;
     QString currentFilePath;
 
+    SettingsManager *settingsManager;
     SyntaxHighlighter* currentHighlighter;
     GrammarLoader grammarLoader;
     QString lastSearchTerm;

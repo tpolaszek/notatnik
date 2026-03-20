@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "settingsmanager.h"
 #include "texttools.h"
+#include "settingsdialog.h"
 #include <QFileDialog>
 #include <QTextStream>
 #include <QFileInfo>
@@ -13,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , currentHighlighter(nullptr)
 {
+
     ui->setupUi(this);
     this->setWindowTitle("Notatnik");
 
@@ -22,6 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     grammarLoader.loadFromDirectory(QDir::currentPath() + "/syntax");
+
+    settingsManager = new SettingsManager(this);
+    settingsManager->applyToApp();
 }
 
 MainWindow::~MainWindow()
@@ -121,3 +127,9 @@ void MainWindow::on_actionFind_triggered()
     }
 }
 
+
+void MainWindow::on_settings_triggered()
+{
+    SettingsDialog dlg(settingsManager, this);
+    dlg.exec();
+}

@@ -5,6 +5,7 @@
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
     : QSyntaxHighlighter(parent) {}
 
+// Ładowanid z pliku json zasad
 void SyntaxHighlighter::loadFromJson(const QJsonObject& grammar){
     rules.clear(); // reset
     QJsonArray jsonRules = grammar["rules"].toArray();
@@ -13,8 +14,10 @@ void SyntaxHighlighter::loadFromJson(const QJsonObject& grammar){
         QJsonObject ruleObj = val.toObject();
         HighlightRule rule;
 
+        //Użycie regexu jako sposób rozpoznawania znaczników
         rule.pattern = QRegularExpression(ruleObj["pattern"].toString());
 
+        //Dodawanie formatowania
         QTextCharFormat fmt;
         fmt.setForeground(QColor(ruleObj["color"].toString()));
         if(ruleObj["bold"].toBool()) fmt.setFontWeight(QFont::Bold);
