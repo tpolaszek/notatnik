@@ -1,6 +1,6 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
-
+*.idx
 *~
 *.autosave
 *.a
@@ -79,4 +79,3 @@ CMakeLists.txt.user*
 .pch/
 .rcc/
 .uic/
-/build*/
