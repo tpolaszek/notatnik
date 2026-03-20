@@ -1,6 +1,7 @@
 #include "texttools.h"
 #include <QScrollBar>
 #include <QStatusBar>
+#include <QInputDialog>
 
 void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
     lineCounter->setReadOnly(true);                // Tylko do odczytu
@@ -53,6 +54,39 @@ void TextTools::findText(QMainWindow *parent, QPlainTextEdit *editor, QString &l
         parent->statusBar()->showMessage("Nie znaleziono: " + lastSearch, 2000);
     }
 }
+void TextTools::findAndReplace(QMainWindow *parent, QPlainTextEdit *editor) {
+    if (!editor || !parent) return;
 
+    // --- 1. INPUT ---
+    bool isConfirmed;
 
+    // Pobieramy frazę, którą chcemy zmienić
+    QString currentText = QInputDialog::getText(parent, "Replace All",
+                                                "Text to find:", QLineEdit::Normal,
+                                                "", &isConfirmed);
+    if (!isConfirmed || currentText.isEmpty()) return;
 
+    // Pobieramy frazę docelową
+    QString targetText = QInputDialog::getText(parent, "Replace All",
+                                               "Replace with:", QLineEdit::Normal,
+                                               "", &isConfirmed);
+    if (!isConfirmed) return;
+
+    // --- 2. EXECUTION ---
+    editor->moveCursor(QTextCursor::Start);
+    int replacementCount = 0;
+
+    while (editor->find(currentText)) {
+        editor->insertPlainText(targetText);
+        replacementCount++;
+    }
+
+    // --- 3. STATUS UPDATE ---
+    if (replacementCount > 0) {
+        // %1 -> " + QString::number(replacementCount) + "
+        QString statusMessage = QString("Successfully replaced %1 occurrences.").arg(replacementCount);
+        parent->statusBar()->showMessage(statusMessage, 3000);
+    } else {
+        parent->statusBar()->showMessage("No matches found.", 3000);
+    }
+}

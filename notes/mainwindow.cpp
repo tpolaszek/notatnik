@@ -128,8 +128,16 @@ void MainWindow::on_actionFind_triggered()
 }
 
 
+
 void MainWindow::on_settings_triggered()
 {
     SettingsDialog dlg(settingsManager, this);
     dlg.exec();
 }
+
+void MainWindow::on_actionFindAndReplace_triggered()
+{
+    TextTools::findAndReplace(this, ui->noteText);
+}
+
+
