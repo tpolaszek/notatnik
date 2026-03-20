@@ -120,3 +120,9 @@ void MainWindow::on_actionFind_triggered()
         TextTools::findText(this, ui->noteText, searchTerm);
     }
 }
+
+void MainWindow::on_actionFindAndReplace_triggered()
+{
+    TextTools::findAndReplace(this, ui->noteText);
+}
+

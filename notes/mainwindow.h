@@ -29,14 +29,18 @@ private slots:
 
     void on_actionFind_triggered();
 
+    void on_actionFindAndReplace_triggered();
+
 private:
     void applyHighlighter(const QString& filePath);
 
     Ui::MainWindow* ui;
     QString currentFilePath;
+
     SyntaxHighlighter* currentHighlighter;
     GrammarLoader grammarLoader;
     QString lastSearchTerm;
+
 };
 
 #endif // MAINWINDOW_H

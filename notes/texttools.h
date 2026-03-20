@@ -11,9 +11,8 @@ public:
     static void updateLineCounter(QPlainTextEdit *editor, QPlainTextEdit *lineCounter);
     static void setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter);
     static void findText(QMainWindow *parent, QPlainTextEdit *editor, QString &lastSearch);
-    //static void findAndReplace(QMainWindow *parent, QPlainTextEdit *editor);
-    static void updateLineCounter(QPlainTextEdit *editor, QTextEdit *lineCounter);
-    static void applyDynamicWidth(int lineCount, QTextEdit *lineCounter);
+    static void findAndReplace(QMainWindow *parent, QPlainTextEdit *editor);
+    static void applyDynamicWidth(int lineCount, QPlainTextEdit *lineCounter);
 };
 
 #endif // TEXTTOOLS_H
