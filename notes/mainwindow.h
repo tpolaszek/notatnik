@@ -34,6 +34,8 @@ private slots:
     void on_settings_triggered();
     void on_actionFindAndReplace_triggered();
 
+    void on_actionPunktowana_triggered();
+
 private:
     void applyHighlighter(const QString& filePath);
 
