@@ -2,6 +2,7 @@
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QInputDialog>
+#include <QTextBlock>
 
 void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
     lineCounter->setReadOnly(true);                // Tylko do odczytu
@@ -89,4 +90,25 @@ void TextTools::findAndReplace(QMainWindow *parent, QPlainTextEdit *editor) {
     } else {
         parent->statusBar()->showMessage("No matches found.", 3000);
     }
+}
+
+void TextTools::toggleBulletList(QPlainTextEdit *editor) {
+    QTextCursor cursor = editor->textCursor();
+    cursor.beginEditBlock(); // Pozwala cofnąć całą operację jednym Ctrl+Z
+
+    // Przesuwamy kursor na początek linii
+    cursor.movePosition(QTextCursor::StartOfLine);
+
+    // Sprawdzamy, czy linia już ma kropkę (żeby ją ewentualnie usunąć)
+    QString lineText = cursor.block().text();
+    if (lineText.startsWith(" • ")) {
+        // Usuwamy kropkę (3 znaki: spacja, kropka, spacja)
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3);
+        cursor.removeSelectedText();
+    } else {
+        // Wstawiamy kropkę
+        cursor.insertText(" • ");
+    }
+
+    cursor.endEditBlock();
 }

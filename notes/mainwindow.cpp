@@ -141,3 +141,8 @@ void MainWindow::on_actionFindAndReplace_triggered()
 }
 
 
+void MainWindow::on_actionPunktowana_triggered()
+{
+    TextTools::toggleBulletList(ui->noteText);
+}
+
