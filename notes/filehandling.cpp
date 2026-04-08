@@ -24,7 +24,7 @@ QString FileHandling::getOpenFilePath(QWidget *parent){
 
 bool FileHandling::saveFile(const QString &filePath, const QString &content){
     QFile file(filePath);
-    if(file.open(QFile::WriteOnly | QFile::Text))return false;
+    if(!file.open(QFile::WriteOnly | QFile::Text))return false;
     QTextStream out(&file);
     out << content;
     file.close();
@@ -33,5 +33,5 @@ bool FileHandling::saveFile(const QString &filePath, const QString &content){
 }
 
 QString FileHandling::getSaveFilePath(QWidget *parent){
-    return QFileDialog::getSaveFileName(parent, "Zapisz jako", "", "Pliki tekstowe (*.txt);;HTML (*.html);;Wszystkie pliki(*)");
+    return QFileDialog::getSaveFileName(parent, "Zapisz jako", "", "Pliki tekstowe (*.txt);;HTML (*.html);;Wszystkie pliki (*)");
 }

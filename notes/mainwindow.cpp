@@ -93,9 +93,9 @@ void MainWindow::on_saveFileAs_triggered()
 {
     QString fileName = FileHandling::getSaveFilePath(this);
     if (fileName.isEmpty()) return;
+    currentFilePath = fileName;
 
     if (FileHandling::saveFile(fileName, ui->noteText->toPlainText())) {
-        currentFilePath = fileName;
         setTitle(currentFilePath);
         applyHighlighter(currentFilePath);
     }
