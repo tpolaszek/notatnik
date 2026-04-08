@@ -31,3 +31,28 @@ QStatusBar {
     background-color: #f5f5f5;
     color: #444444;
 }
+
+QPushButton {
+    color: #000000;
+    background-color: #ffffff;
+}
+
+QListWidget {
+    color: #000000;
+    background-color: #FCFCFC;
+}
+
+QLabel {
+    color: #000000;
+    background-color: #ffffff;
+}
+
+QHBoxLayout {
+    color: #000000;
+    background-color: #ffffff;
+}
+
+QTabWidget {
+    color: #000000;
+    background-color: #ffffff;
+}

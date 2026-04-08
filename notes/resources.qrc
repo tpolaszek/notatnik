@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/syntax">
+        <file alias="html.json">syntax/html.json</file>
+    </qresource>
+    <qresource prefix="/themes">
+        <file alias="dark.css">themes/dark.css</file>
+        <file alias="light.css">themes/light.css</file>
+    </qresource>
+</RCC>

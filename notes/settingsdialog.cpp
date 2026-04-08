@@ -26,7 +26,7 @@ void SettingsDialog::buildUI() {
 
     auto *tabs = new QTabWidget(this);
 
-    auto *appearanceTab    = new QWidget;
+    auto *appearanceTab = new QWidget;
     auto *appearanceLayout = new QVBoxLayout(appearanceTab);
 
     appearanceLayout->addWidget(new QLabel("Wszystkie motywy:"));
@@ -43,7 +43,7 @@ void SettingsDialog::buildUI() {
 
     tabs->addTab(appearanceTab, "Wygląd");
 
-    auto *editorTab    = new QWidget;
+    auto *editorTab = new QWidget;
     auto *editorLayout = new QFormLayout(editorTab);
 
     fontSizeBox = new QSpinBox;
@@ -55,17 +55,15 @@ void SettingsDialog::buildUI() {
     rootLayout->addWidget(tabs);
 
     auto *buttonBox = new QDialogButtonBox;
-    auto *applyBtn  = buttonBox->addButton("Zastosuj",  QDialogButtonBox::ApplyRole);
-    auto *okBtn     = buttonBox->addButton("OK",     QDialogButtonBox::AcceptRole);
+    auto *applyBtn = buttonBox->addButton("Zastosuj", QDialogButtonBox::ApplyRole);
+    auto *okBtn = buttonBox->addButton("OK", QDialogButtonBox::AcceptRole);
     auto *cancelBtn = buttonBox->addButton("Anuluj", QDialogButtonBox::RejectRole);
     rootLayout->addWidget(buttonBox);
 
-    connect(themeList, &QListWidget::itemClicked,
-            this, &SettingsDialog::onThemeSelected);
-    connect(browseButton, &QPushButton::clicked,
-            this, &SettingsDialog::onBrowseClicked);
-    connect(applyBtn,  &QPushButton::clicked, this, &SettingsDialog::onApplyClicked);
-    connect(okBtn,     &QPushButton::clicked, this, &SettingsDialog::onOkClicked);
+    connect(themeList, &QListWidget::itemClicked, this, &SettingsDialog::onThemeSelected);
+    connect(browseButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseClicked);
+    connect(applyBtn, &QPushButton::clicked, this, &SettingsDialog::onApplyClicked);
+    connect(okBtn, &QPushButton::clicked, this, &SettingsDialog::onOkClicked);
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 }
 

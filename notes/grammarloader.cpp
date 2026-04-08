@@ -11,8 +11,14 @@ void GrammarLoader::loadFromDirectory(const QString& dirPath) {
 
     //Otwieranie plików i obsługa błędów
     for(const QString& fileName : jsonFiles){
-        QFile file(dir.filePath(fileName));
-        if(!file.open(QFile::ReadOnly)) continue;
+        QString fullPath = dirPath + "/" + fileName;
+        qDebug() << "Trying to open:" << fullPath;
+        QFile file(fullPath);
+        qDebug() << "File exists:" << file.exists();
+        if(!file.open(QFile::ReadOnly)){
+            qDebug() << "Failed to open:" << file.errorString();
+            continue;
+        }
 
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         if(doc.isNull()) continue;

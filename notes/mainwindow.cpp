@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , currentHighlighter(nullptr)
 {
-
     ui->setupUi(this);
     this->setWindowTitle("Notatnik");
 
@@ -24,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
     });
 
-    grammarLoader.loadFromDirectory(QDir::currentPath() + "/syntax");
+    grammarLoader.loadFromDirectory(":/syntax");
 
     settingsManager = new SettingsManager(this);
     settingsManager->applyToApp();

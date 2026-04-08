@@ -12,7 +12,9 @@ SettingsManager::SettingsManager(QObject *parent)
 
 // Skanuje folder /themes w folderze aplikacji
 QStringList SettingsManager::availableThemes() const {
-    QDir dir(QApplication::applicationDirPath() + "/themes");
+    QDir dir(":/themes");
+    qDebug() << "Themes dir exists:" << dir.exists();
+    qDebug() << "Theme files:" << dir.entryList({"*.css"}, QDir::Files);
     QStringList result;
     for (const QString &file : dir.entryList({"*.css"}, QDir::Files))
         result << dir.filePath(file);
