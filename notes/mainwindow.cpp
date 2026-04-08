@@ -82,35 +82,22 @@ void MainWindow::on_createFile_triggered()
 
 void MainWindow::on_saveFile_triggered()
 {
-    if(currentFilePath.isEmpty()){
+    if (currentFilePath.isEmpty()) {
         on_saveFileAs_triggered();
     } else {
-        QFile file(currentFilePath);
-        if(file.open(QFile::WriteOnly | QFile::Text)){
-            QTextStream out(&file);
-            out << ui->noteText->toPlainText();
-            file.close();
-        }
+        FileHandling::saveFile(currentFilePath, ui->noteText->toPlainText());
     }
 }
 
 void MainWindow::on_saveFileAs_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Zapisz jako", "", "Pliki tekstowe (*.txt);;Wszystkie pliki (*)");
+    QString fileName = FileHandling::getSaveFilePath(this);
+    if (fileName.isEmpty()) return;
 
-    if(!fileName.isEmpty()){
+    if (FileHandling::saveFile(fileName, ui->noteText->toPlainText())) {
         currentFilePath = fileName;
-
-        QFile file(fileName);
-        if(file.open(QFile::WriteOnly | QFile::Text)){
-            QTextStream out(&file);
-            out << ui->noteText->toPlainText();
-            setTitle(currentFilePath);
-            file.close();
-
-            // Re-apply since extension may have changed
-            applyHighlighter(currentFilePath);
-        }
+        setTitle(currentFilePath);
+        applyHighlighter(currentFilePath);
     }
 }
 
