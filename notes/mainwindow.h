@@ -39,6 +39,8 @@ private slots:
 
     void fillRecentMenu();
 
+    void on_closeFile_triggered();
+
 private:
     void applyHighlighter(const QString &filePath);
     void recordAndRefresh(const QString &filePath);

@@ -174,3 +174,14 @@ void MainWindow::on_actionFindAndReplace_triggered()
 }
 
 
+
+void MainWindow::on_closeFile_triggered()
+{
+    delete currentHighlighter;
+    currentHighlighter = nullptr;
+
+    ui->noteText->clear();
+    currentFilePath = QString();
+    this->setWindowTitle("Notatnik");
+}
+
