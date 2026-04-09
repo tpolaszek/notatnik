@@ -13,6 +13,7 @@ SOURCES += \
     grammarloader.cpp \
     main.cpp \
     mainwindow.cpp \
+    recentfilesmanager.cpp \
     settingsdialog.cpp \
     settingsmanager.cpp \
     syntaxhighlighter.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     filehandling.h \
     grammarloader.h \
     mainwindow.h \
+    recentfilesmanager.h \
     settingsdialog.h \
     settingsmanager.h \
     syntaxhighlighter.h \

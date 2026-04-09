@@ -38,13 +38,13 @@ void SettingsManager::setFontSize(int size) {
 }
 
 void SettingsManager::save() {
-    QSettings s("MyCompany", "Notatnik");
+    QSettings s("nazwa", "Notatnik");
     s.setValue("theme/path", themePath);
     s.setValue("editor/fontSize", defaultfontSize);
 }
 
 void SettingsManager::load() {
-    QSettings s("MyCompany", "Notatnik");
+    QSettings s("nazwa", "Notatnik");
     themePath = s.value("theme/path", QString()).toString();
     defaultfontSize  = s.value("editor/fontSize", 12).toInt();
 }

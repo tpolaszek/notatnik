@@ -79,7 +79,12 @@
     </property>
     <addaction name="createFile"/>
     <addaction name="openFile"/>
-    <addaction name="openedRecently"/>
+    <widget class="QMenu" name="menuOstatnioOtwarte">
+      <property name="title">
+       <string>Ostatnio otwarte</string>
+      </property>
+    </widget>
+    <addaction name="menuOstatnioOtwarte"/>
     <addaction name="separator"/>
     <addaction name="saveFile"/>
     <addaction name="saveFileAs"/>
@@ -136,11 +141,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
-   </property>
-  </action>
-  <action name="openedRecently">
-   <property name="text">
-    <string>Ostatnio otwarte</string>
    </property>
   </action>
   <action name="closeFile">

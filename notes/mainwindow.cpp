@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     settingsManager = new SettingsManager(this);
     settingsManager->applyToApp();
+
+    recentMenu = ui->menuOstatnioOtwarte;
+    connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
 }
 
 MainWindow::~MainWindow()
@@ -55,6 +58,48 @@ void MainWindow::applyHighlighter(const QString& filePath)
     }
 }
 
+void MainWindow::openFileFromPath(const QString &filePath){
+    if(filePath.isEmpty()) return;
+
+    QString content = FileHandling::openFile(filePath);
+    if(content.isNull()) return;
+
+    ui->noteText->setPlainText(content);
+    currentFilePath = filePath;
+    setTitle(filePath);
+    applyHighlighter(filePath);
+    recordAndRefresh(filePath);
+}
+
+void MainWindow::recordAndRefresh(const QString &filePath) {
+    recentMgr.recordFile(filePath);  // dot not arrow, it's a value now
+}
+
+void MainWindow::fillRecentMenu(){
+    recentMenu->clear();
+
+    const QList<RecentFile> files = recentMgr.recentFiles();
+    if(files.isEmpty()) {
+        QAction *empty = recentMenu->addAction("Brak plików");
+        empty->setEnabled(false);
+        return;
+    }
+
+    for(const RecentFile &rf : files){
+        QFileInfo info(rf.path);
+
+        QString label = info.fileName() + "    " + rf.lastModified.toString("dd.MM.yyyy  hh:mm");
+
+        QAction *act = recentMenu->addAction(label);
+        act->setToolTip(rf.path);
+
+        const QString path = rf.path;
+        connect(act, &QAction::triggered, this, [this, path](){
+            openFileFromPath(path);
+        });
+    }
+}
+
 void MainWindow::on_openFile_triggered()
 {
     QString filePath = FileHandling::getOpenFilePath(this);
@@ -66,6 +111,7 @@ void MainWindow::on_openFile_triggered()
         currentFilePath = filePath;
         setTitle(filePath);
         applyHighlighter(filePath);
+        recordAndRefresh(filePath);
     }
 }
 
@@ -97,6 +143,7 @@ void MainWindow::on_saveFileAs_triggered()
     if (FileHandling::saveFile(fileName, ui->noteText->toPlainText())) {
         setTitle(currentFilePath);
         applyHighlighter(currentFilePath);
+        recordAndRefresh(currentFilePath);
     }
 }
 

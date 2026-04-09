@@ -7,6 +7,7 @@
 #include "syntaxhighlighter.h"
 #include "settingsmanager.h"
 #include "settingsdialog.h"
+#include "recentfilesmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,9 +20,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setTitle(QString title);
+
+    void openFileFromPath(const QString &filePath);
 
 private slots:
     void on_openFile_triggered();
@@ -34,17 +37,22 @@ private slots:
     void on_settings_triggered();
     void on_actionFindAndReplace_triggered();
 
+    void fillRecentMenu();
+
 private:
-    void applyHighlighter(const QString& filePath);
+    void applyHighlighter(const QString &filePath);
+    void recordAndRefresh(const QString &filePath);
 
     Ui::MainWindow* ui;
     QString currentFilePath;
+    QString lastSearchTerm;
 
     SettingsManager *settingsManager;
     SyntaxHighlighter* currentHighlighter;
-    GrammarLoader grammarLoader;
-    QString lastSearchTerm;
+    GrammarLoader grammarLoader;    
+    RecentFilesManager recentMgr;
 
+    QMenu *recentMenu = nullptr;
 };
 
 #endif // MAINWINDOW_H
