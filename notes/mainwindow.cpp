@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     settingsManager = new SettingsManager(this);
     settingsManager->applyToApp();
+
 }
 
 MainWindow::~MainWindow()
@@ -114,7 +115,7 @@ void MainWindow::on_saveFileAs_triggered()
     }
 }
 
-void MainWindow::on_actionFind_triggered()
+void MainWindow::on_Find_triggered()
 {
     bool isConfirmed;
 
@@ -135,9 +136,16 @@ void MainWindow::on_settings_triggered()
     dlg.exec();
 }
 
-void MainWindow::on_actionFindAndReplace_triggered()
+void MainWindow::on_FindAndReplace_triggered()
 {
     TextTools::findAndReplace(this, ui->noteText);
 }
 
 
+// void MainWindow::on_Preview_triggered() {
+//     viewManager->switchToPreview();
+// }
+
+// void MainWindow::on_Edit_triggered() {
+//     viewManager->switchToEdit();
+// }

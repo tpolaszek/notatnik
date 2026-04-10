@@ -16,7 +16,8 @@ SOURCES += \
     settingsdialog.cpp \
     settingsmanager.cpp \
     syntaxhighlighter.cpp \
-    texttools.cpp
+    texttools.cpp \
+    viewmanager.cpp
 
 HEADERS += \
     filehandling.h \
@@ -25,7 +26,8 @@ HEADERS += \
     settingsdialog.h \
     settingsmanager.h \
     syntaxhighlighter.h \
-    texttools.h
+    texttools.h \
+    viewmanager.h
 
 FORMS += \
     mainwindow.ui

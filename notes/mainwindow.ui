@@ -70,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOtw_rz_plik">
@@ -98,12 +98,20 @@
     <property name="title">
      <string>Narzędzia</string>
     </property>
-    <addaction name="actionFind"/>
-    <addaction name="actionFindAndReplace"/>
+    <addaction name="Find"/>
+    <addaction name="FindAndReplace"/>
+   </widget>
+   <widget class="QMenu" name="menuWidok">
+    <property name="title">
+     <string>Widok</string>
+    </property>
+    <addaction name="Preview"/>
+    <addaction name="Edit"/>
    </widget>
    <addaction name="menuOtw_rz_plik"/>
    <addaction name="menuUstawienia"/>
    <addaction name="menuNarz_dzia"/>
+   <addaction name="menuWidok"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openFile">
@@ -161,7 +169,7 @@
     <string>Utwórz plik</string>
    </property>
   </action>
-  <action name="actionFind">
+  <action name="Find">
    <property name="text">
     <string>Znajdź</string>
    </property>
@@ -169,12 +177,25 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionFindAndReplace">
+  <action name="FindAndReplace">
    <property name="text">
     <string>Znajdź i zamień</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="Preview">
+   <property name="text">
+    <string>Podgląd</string>
+   </property>
+  </action>
+  <action name="Edit">
+   <property name="text">
+    <string>Edycja</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit</string>
    </property>
   </action>
  </widget>

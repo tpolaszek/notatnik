@@ -26,13 +26,24 @@ void TextTools::updateLineCounter(QPlainTextEdit *editor, QPlainTextEdit *lineCo
         lineNumbers += QString::number(i) + "\n";
     }
     lineCounter->setPlainText(lineNumbers);
+    lineCounter->verticalScrollBar()->setValue(editor->verticalScrollBar()->value());
 }
 void TextTools::applyDynamicWidth(int totalLines, QPlainTextEdit *lineCounter) {
-    if (totalLines >= 1000) {
-        lineCounter->setFixedWidth(45);
-    } else {
-        lineCounter->setFixedWidth(35);
-    }
+    // 1. Pobieramy informacje o czcionce, która jest aktualnie w liczniku
+    QFontMetrics metrics(lineCounter->font());
+
+    // 2. Tworzymy wzorcowy ciąg znaków (najdłuższy możliwy numer linii)
+    QString longestLine = QString::number(totalLines);
+
+    // 3. Obliczamy szerokość tego tekstu w pikselach
+    // horizontalAdvance mówi nam, ile miejsca zajmie ten string w poziomie
+    int textWidth = metrics.horizontalAdvance(longestLine);
+
+    // 4. Dodajemy marginesy (np. 15-20 pikseli), żeby liczby nie dotykały krawędzi
+    int finalWidth = textWidth + 25;
+
+    // 5. Ustawiamy szerokość
+    lineCounter->setFixedWidth(finalWidth);
 }
 
 void TextTools::findText(QMainWindow *parent, QPlainTextEdit *editor, QString &lastSearch) {
