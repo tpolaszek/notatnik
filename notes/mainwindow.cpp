@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     recentMenu = ui->menuOstatnioOtwarte;
     connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
+
+    viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
 }
 
 MainWindow::~MainWindow()
@@ -147,7 +149,7 @@ void MainWindow::on_saveFileAs_triggered()
     }
 }
 
-void MainWindow::on_actionFind_triggered()
+void MainWindow::on_Find_triggered()
 {
     bool isConfirmed;
 
@@ -168,11 +170,10 @@ void MainWindow::on_settings_triggered()
     dlg.exec();
 }
 
-void MainWindow::on_actionFindAndReplace_triggered()
+void MainWindow::on_FindAndReplace_triggered()
 {
     TextTools::findAndReplace(this, ui->noteText);
 }
-
 
 
 void MainWindow::on_closeFile_triggered()
@@ -185,3 +186,10 @@ void MainWindow::on_closeFile_triggered()
     this->setWindowTitle("Notatnik");
 }
 
+ void MainWindow::on_Preview_triggered() {
+     viewManager->switchToPreview();
+ }
+
+ void MainWindow::on_Edit_triggered() {
+     viewManager->switchToEdit();
+ }

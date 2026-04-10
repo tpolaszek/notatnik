@@ -8,6 +8,7 @@
 #include "settingsmanager.h"
 #include "settingsdialog.h"
 #include "recentfilesmanager.h"
+#include "viewmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,10 +33,14 @@ private slots:
     void on_saveFile_triggered();
     void on_saveFileAs_triggered();
 
-    void on_actionFind_triggered();
+    void on_Find_triggered();
 
     void on_settings_triggered();
-    void on_actionFindAndReplace_triggered();
+    void on_FindAndReplace_triggered();
+
+    void on_Preview_triggered();
+
+    void on_Edit_triggered();
 
     void fillRecentMenu();
 
@@ -53,6 +58,7 @@ private:
     SyntaxHighlighter* currentHighlighter;
     GrammarLoader grammarLoader;    
     RecentFilesManager recentMgr;
+    ViewManager* viewManager;
 
     QMenu *recentMenu = nullptr;
 };
