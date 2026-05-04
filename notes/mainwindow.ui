@@ -70,20 +70,20 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOtw_rz_plik">
     <property name="title">
      <string>Plik</string>
     </property>
+    <widget class="QMenu" name="menuOstatnioOtwarte">
+     <property name="title">
+      <string>Ostatnio otwarte</string>
+     </property>
+    </widget>
     <addaction name="createFile"/>
     <addaction name="openFile"/>
-    <widget class="QMenu" name="menuOstatnioOtwarte">
-      <property name="title">
-       <string>Ostatnio otwarte</string>
-      </property>
-    </widget>
     <addaction name="menuOstatnioOtwarte"/>
     <addaction name="separator"/>
     <addaction name="saveFile"/>

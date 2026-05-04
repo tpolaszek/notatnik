@@ -6,4 +6,8 @@
         <file alias="dark.css">themes/dark.css</file>
         <file alias="light.css">themes/light.css</file>
     </qresource>
+    <qresource prefix="/">
+        <file>icons/preview.png</file>
+	<file>icons/edit.png</file>
+    </qresource>
 </RCC>

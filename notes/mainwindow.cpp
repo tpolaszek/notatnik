@@ -8,7 +8,7 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QInputDialog>
-
+#include <QToolButton>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,6 +21,32 @@ MainWindow::MainWindow(QWidget *parent)
     TextTools::setupLineCounterUI(ui->noteText, ui->lineCounter);
     connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
+    });
+
+    auto *viewMode = new QToolButton(this);
+    viewMode->setIcon(QIcon(":/icons/preview.png"));
+    viewMode->setToolTip("Podgląd / Edycja");
+
+    // Ustawia wielkość przycisku i ikony w nim zawartej
+    viewMode->setIconSize(QSize(32, 32));
+    viewMode->setFixedSize(QSize(32, 32));
+
+    // Przycisk pokazuje się w prawym górnym rogu menuBara
+    menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
+
+    // Ustawienie przezroczystego tła dla przycisku
+    viewMode->setStyleSheet("QToolButton { border: none; background: transparent; }" "QToolButton:hover { background: rgba(255,255,255,30); border-radius: 4px; }");
+
+    bool *isPreview = new bool(false); // przechowuje stan wyświetlania
+    connect(viewMode, &QToolButton::clicked, this, [this, viewMode, isPreview]() {
+        *isPreview = !*isPreview;
+        if (*isPreview) {
+            viewManager->switchToPreview();
+            viewMode->setIcon(QIcon(":/icons/edit.png"));
+        } else {
+            viewManager->switchToEdit();
+            viewMode->setIcon(QIcon(":/icons/preview.png"));
+        }
     });
 
     grammarLoader.loadFromDirectory(":/syntax");
@@ -163,7 +189,6 @@ void MainWindow::on_Find_triggered()
 }
 
 
-
 void MainWindow::on_settings_triggered()
 {
     SettingsDialog dlg(settingsManager, this);
@@ -175,7 +200,6 @@ void MainWindow::on_FindAndReplace_triggered()
     TextTools::findAndReplace(this, ui->noteText);
 }
 
-
 void MainWindow::on_closeFile_triggered()
 {
     delete currentHighlighter;
@@ -185,11 +209,3 @@ void MainWindow::on_closeFile_triggered()
     currentFilePath = QString();
     this->setWindowTitle("Notatnik");
 }
-
- void MainWindow::on_Preview_triggered() {
-     viewManager->switchToPreview();
- }
-
- void MainWindow::on_Edit_triggered() {
-     viewManager->switchToEdit();
- }

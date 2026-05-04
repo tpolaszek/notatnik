@@ -8,21 +8,15 @@ void ViewManager::applyStyles(bool isEditing) {
     m_editor->setReadOnly(!isEditing);
 
     // Ustawienie flag interakcji
-    m_editor->setTextInteractionFlags(isEditing ? Qt::TextEditorInteraction
-                                                : (Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard));
-
+    m_editor->setTextInteractionFlags(isEditing ? Qt::TextEditorInteraction: (Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard));
     // Zarządzanie licznikiem linii
     m_lineCounter->setVisible(isEditing);
 
-    // Wygląd
     if (isEditing) {
-        m_editor->setStyleSheet(""); // Przywróć domyślny
-        m_statusBar->showMessage("Mode: Editing");
+        m_statusBar->showMessage("Tryb: edycji");
         TextTools::updateLineCounter(m_editor, m_lineCounter);
-        m_editor->setFocus();
     } else {
-        m_editor->setStyleSheet("background-color: #f4f4f4; color: #555555;");
-        m_statusBar->showMessage("Mode: Preview (Read-Only)");
+        m_statusBar->showMessage("Tryb: przeglądania");
     }
 }
 
