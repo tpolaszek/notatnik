@@ -13,43 +13,47 @@ SettingsManager::SettingsManager(QObject *parent)
 // Skanuje folder /themes w folderze aplikacji
 QStringList SettingsManager::availableThemes() const {
     QDir dir(":/themes");
-    qDebug() << "Themes dir exists:" << dir.exists();
-    qDebug() << "Theme files:" << dir.entryList({"*.css"}, QDir::Files);
     QStringList result;
     for (const QString &file : dir.entryList({"*.css"}, QDir::Files))
         result << dir.filePath(file);
     return result;
 }
 
+// Zwraca aktualną ścieżke pliku motywu
 QString SettingsManager::currentThemePath() const {
     return themePath;
 }
 
+// Ustawia motyw
 void SettingsManager::setThemePath(const QString &path) {
     themePath = path;
 }
 
+// Zwraca domyślną wielkość czcionki
 int SettingsManager::fontSize() const {
     return defaultfontSize;
 }
 
+// Ustawia rozmiar czcionki
 void SettingsManager::setFontSize(int size) {
     defaultfontSize = size;
 }
 
+// Zapisuje ustawienia
 void SettingsManager::save() {
-    QSettings s("nazwa", "Notatnik");
+    QSettings s("Ustawienie", "Notatnik");
     s.setValue("theme/path", themePath);
     s.setValue("editor/fontSize", defaultfontSize);
 }
 
+// Wczytuje zapisane ustawienie
 void SettingsManager::load() {
-    QSettings s("nazwa", "Notatnik");
+    QSettings s("Ustawienie", "Notatnik");
     themePath = s.value("theme/path", QString()).toString();
-    defaultfontSize  = s.value("editor/fontSize", 12).toInt();
+    defaultfontSize = s.value("editor/fontSize", 12).toInt();
 }
 
-// Aplikuje zmiany do pliku css
+// Zamienia css na utf-8
 QString SettingsManager::composeStylesheet() const {
     QString css;
 
@@ -59,12 +63,10 @@ QString SettingsManager::composeStylesheet() const {
             css = QString::fromUtf8(f.readAll());
     }
 
-    // Nadpisz zmiane wielkości czcionki do pliku
-    css += QString("\nQPlainTextEdit { font-size: %1pt; }").arg(defaultfontSize);
-
     return css;
 }
 
+// Aplikuje zmieniony w metodzie composeStyleSheet css do aplikacji
 void SettingsManager::applyToApp() {
     qApp->setStyleSheet(composeStylesheet());
 }

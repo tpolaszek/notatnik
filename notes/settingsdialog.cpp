@@ -1,131 +1,92 @@
 #include "settingsdialog.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QTabWidget>
-#include <QPushButton>
-#include <QLabel>
+#include "ui_settings.h"
+#include "settingsmanager.h"
+#include <QStackedWidget>
 #include <QFileDialog>
-#include <QListWidgetItem>
 #include <QFileInfo>
-#include <QFormLayout>
-#include <QDialogButtonBox>
 
 SettingsDialog::SettingsDialog(SettingsManager *manager, QWidget *parent)
-    : QDialog(parent), manager(manager)
+    : QDialog(parent)
+    , ui(new Ui::SettingsWindow)
+    , manager(manager)
 {
-    setWindowTitle("Settings");
-    setMinimumWidth(400);
-    buildUI();
+    ui->setupUi(this);
+
+    connect(ui->listWidget, &QListWidget::currentRowChanged, ui->stackedWidget, &QStackedWidget::setCurrentIndex);
+
+    connect(ui->themeList, &QListWidget::itemClicked, this, &SettingsDialog::onThemeSelected);
+
+    // podłączenie wszystkich przycisków do metod
+    connect(ui->browseButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseClicked); // po kliknięciu przycisku "Przeglądaj" uaktywnia metode onBrowseClicked()
+    connect(ui->pushButton,   &QPushButton::clicked, this, &SettingsDialog::onApplyClicked); // po kliknięciu zastosuj uaktywnia metode onApplyClicked()
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &SettingsDialog::onOkClicked);  // po kliknięciu OK ukatywnia metode onOkClicked()
+
     populateThemeList();
     selectCurrentTheme();
-    fontSizeBox->setValue(manager->fontSize());
 }
 
-void SettingsDialog::buildUI() {
-    auto *rootLayout = new QVBoxLayout(this);
-
-    auto *tabs = new QTabWidget(this);
-
-    auto *appearanceTab = new QWidget;
-    auto *appearanceLayout = new QVBoxLayout(appearanceTab);
-
-    appearanceLayout->addWidget(new QLabel("Wszystkie motywy:"));
-
-    themeList = new QListWidget;
-    appearanceLayout->addWidget(themeList);
-
-    auto *browseRow = new QHBoxLayout;
-    previewLabel = new QLabel("Nie wybrano motywu");
-    auto *browseButton = new QPushButton("Szukaj niestandardowych motywów..");
-    browseRow->addWidget(previewLabel, 1);
-    browseRow->addWidget(browseButton);
-    appearanceLayout->addLayout(browseRow);
-
-    tabs->addTab(appearanceTab, "Wygląd");
-
-    auto *editorTab = new QWidget;
-    auto *editorLayout = new QFormLayout(editorTab);
-
-    fontSizeBox = new QSpinBox;
-    fontSizeBox->setRange(6, 72);
-    editorLayout->addRow("Rozmiar czcionki (pt):", fontSizeBox);
-
-    tabs->addTab(editorTab, "Edytor");
-
-    rootLayout->addWidget(tabs);
-
-    auto *buttonBox = new QDialogButtonBox;
-    auto *applyBtn = buttonBox->addButton("Zastosuj", QDialogButtonBox::ApplyRole);
-    auto *okBtn = buttonBox->addButton("OK", QDialogButtonBox::AcceptRole);
-    auto *cancelBtn = buttonBox->addButton("Anuluj", QDialogButtonBox::RejectRole);
-    rootLayout->addWidget(buttonBox);
-
-    connect(themeList, &QListWidget::itemClicked, this, &SettingsDialog::onThemeSelected);
-    connect(browseButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseClicked);
-    connect(applyBtn, &QPushButton::clicked, this, &SettingsDialog::onApplyClicked);
-    connect(okBtn, &QPushButton::clicked, this, &SettingsDialog::onOkClicked);
-    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+SettingsDialog::~SettingsDialog() {
+    delete ui;
 }
 
-// uzupełnia liste wszystkimi pliami .css w /themes/
+// Wypełnienie listy motywów plikami dostępnymi w /themes/ z rozszerzeniem .css
 void SettingsDialog::populateThemeList() {
-    themeList->clear();
+    ui->themeList->clear(); // czyszczenie listy
+
+    // Dodaje każdy plik dostępny w folderze który jest odczytywany w metodzie availableThemes() w settingsmanager.cpp (14)
     for (const QString &path : manager->availableThemes()) {
         auto *item = new QListWidgetItem(QFileInfo(path).baseName());
         item->setData(Qt::UserRole, path);
-        themeList->addItem(item);
+        ui->themeList->addItem(item);
     }
 }
 
-// Pokazuje który motyw jest teraz aktywny
+// Pokazuje aktualnie używany motyw
 void SettingsDialog::selectCurrentTheme() {
     const QString current = manager->currentThemePath();
-    for (int i = 0; i < themeList->count(); ++i) {
-        if (themeList->item(i)->data(Qt::UserRole).toString() == current) {
-            themeList->setCurrentRow(i);
-            previewLabel->setText(QFileInfo(current).baseName());
+    for (int i = 0; i < ui->themeList->count(); ++i) {
+        if (ui->themeList->item(i)->data(Qt::UserRole).toString() == current) {
+            ui->themeList->setCurrentRow(i);
             break;
         }
     }
 }
 
+// Po wybraniu motywu aplikuje go
 void SettingsDialog::onThemeSelected(QListWidgetItem *item) {
+    if (!item) return; // jeśli nie ma żadnych "przedmiotów" czyli elementów ListWidgeta nic nie pokazuje
     QString path = item->data(Qt::UserRole).toString();
-    manager->setThemePath(path);
-    previewLabel->setText(QFileInfo(path).baseName());
+    manager->setThemePath(path); // ustawia motyw na wybrany przez użytkownika motyw logika -> settingsmanager.cpp na linii 26
 }
 
-// pozwala uzyc dowolnego pliku .css na komputerze
+// Po kliknięciu "Przeglądaj" otwiera okno dialogowe w którym wybiera się niestandardowy motyw do aplikacji
 void SettingsDialog::onBrowseClicked() {
-    QString path = QFileDialog::getOpenFileName(
-        this, "Otwórz niestandardowy motyw", QDir::homePath(), "Pliki CSS (*.css)");
-    if (path.isEmpty()) return;
+    QString path = QFileDialog::getOpenFileName(this, "Otwórz niestandardowy motyw", QDir::homePath(), "Pliki CSS (*.css)");
+    if (path.isEmpty()) return; // jeśli nie ma pliku nie dodawaj nic
 
-    // Dodaj do listy jeśli nie ma żadnych
-    for (int i = 0; i < themeList->count(); ++i)
-        if (themeList->item(i)->data(Qt::UserRole).toString() == path) {
-            themeList->setCurrentRow(i);
+    for (int i = 0; i < ui->themeList->count(); ++i) {
+        if (ui->themeList->item(i)->data(Qt::UserRole).toString() == path) {
+            ui->themeList->setCurrentRow(i);
             return;
         }
+    }
 
-    auto *item = new QListWidgetItem(QFileInfo(path).baseName() + " (niestandardowy)");
+    auto *item = new QListWidgetItem(QFileInfo(path).baseName() + " (niestandardowy)"); // dodaje niestandardowe motywy
     item->setData(Qt::UserRole, path);
-    themeList->addItem(item);
-    themeList->setCurrentItem(item);
+    ui->themeList->addItem(item);
+    ui->themeList->setCurrentItem(item); // ustawia ten motyw od razu po dodaniu go
 
     manager->setThemePath(path);
-    previewLabel->setText(QFileInfo(path).baseName());
 }
 
-// Zastosuj zmiany bez zamykania oka
+// Po kliknięciu zastosuj aplikuje zmienione ustawienia
 void SettingsDialog::onApplyClicked() {
-    manager->setFontSize(fontSizeBox->value());
-    manager->save();
-    manager->applyToApp();
+    manager->setFontSize(ui->fontSizeBox->value()); // zmienia czcionke na podaną w fontSizeBox
+    manager->save(); // zapisuje ustawienia
+    manager->applyToApp(); // Aplikuje zmienone ustawienia
 }
 
-// Zastosuj zmiany i zamknij okno
+// Po kliknięciu OK zamyka okno bez zapisywania zmian
 void SettingsDialog::onOkClicked() {
-    onApplyClicked();
     accept();
 }
