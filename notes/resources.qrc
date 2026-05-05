@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/syntax">
-        <file alias="html.json">syntax/html.json</file>
+        <file>syntax/html.json</file>
+        <file>syntax/cpp.json</file>
+        <file>syntax/python.json</file>
     </qresource>
     <qresource prefix="/themes">
         <file alias="dark.css">themes/dark.css</file>
@@ -8,6 +10,6 @@
     </qresource>
     <qresource prefix="/">
         <file>icons/preview.png</file>
-	<file>icons/edit.png</file>
+        <file>icons/edit.png</file>
     </qresource>
 </RCC>

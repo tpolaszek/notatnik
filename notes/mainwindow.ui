@@ -70,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOtw_rz_plik">
@@ -106,17 +106,9 @@
     <addaction name="Find"/>
     <addaction name="FindAndReplace"/>
    </widget>
-   <widget class="QMenu" name="menuWidok">
-    <property name="title">
-     <string>Widok</string>
-    </property>
-    <addaction name="Preview"/>
-    <addaction name="Edit"/>
-   </widget>
    <addaction name="menuOtw_rz_plik"/>
    <addaction name="menuUstawienia"/>
    <addaction name="menuNarz_dzia"/>
-   <addaction name="menuWidok"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openFile">

@@ -1,0 +1,64 @@
+{
+  "name": "Python",
+  "extensions": ["py", "pyw", "pyx"],
+  "rules": [
+    {
+      "name": "keyword.control",
+      "pattern": "\\b(if|else|elif|for|while|break|continue|return|yield|try|except|finally|raise|import|from|as|with|pass|match|case)\\b",
+      "color": "#C586C0",
+      "bold": true
+    },
+    {
+      "name": "keyword.other",
+      "pattern": "\\b(def|class|lambda|global|nonlocal|del|assert|async|await)\\b",
+      "color": "#569CD6",
+      "bold": true
+    },
+    {
+      "name": "keyword.operator.logical",
+      "pattern": "\\b(and|or|not|is|in)\\b",
+      "color": "#C586C0"
+    },
+    {
+      "name": "constant.language",
+      "pattern": "\\b(True|False|None)\\b",
+      "color": "#569CD6"
+    },
+    {
+      "name": "entity.name.type",
+      "pattern": "\\b(int|float|str|list|dict|set|tuple|bool|object|bytes|complex|range|enumerate|zip|reversed|sorted|len|print|input|open)\\b",
+      "color": "#4EC9B0"
+    },
+    {
+      "name": "entity.name.function",
+      "pattern": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()",
+      "color": "#DCDCAA"
+    },
+    {
+      "name": "string.quoted",
+      "pattern": "(\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''|\"[^\"]*\"|'[^']*')",
+      "color": "#CE9178"
+    },
+    {
+      "name": "comment.line",
+      "pattern": "#.*",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "constant.numeric",
+      "pattern": "\\b([0-9]+\\.?[0-9]*([eE][+-]?[0-9]+)?|0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+)\\b",
+      "color": "#B5CEA8"
+    },
+    {
+      "name": "variable.language.special",
+      "pattern": "\\b(self|cls|__name__|__main__)\\b",
+      "color": "#9CDCFE"
+    },
+    {
+      "name": "meta.decorator",
+      "pattern": "@[A-Za-z_][A-Za-z0-9_]*",
+      "color": "#DCDCAA"
+    }
+  ]
+}

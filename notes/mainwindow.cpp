@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    grammarLoader.loadFromDirectory(":/syntax");
+    grammarLoader.loadFromDirectory(":/syntax/syntax");
 
     settingsManager = new SettingsManager(this);
     settingsManager->applyToApp();
@@ -175,19 +175,22 @@ void MainWindow::on_saveFileAs_triggered()
     }
 }
 
+
 void MainWindow::on_Find_triggered()
 {
-    bool isConfirmed;
+    bool ok;
+    // 1. Pobierasz tekst (podpowiada ostatnio szukane słowo)
+    QString searchTerm = QInputDialog::getText(this, "Szukaj", "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
 
-    // Pobieramy tekst od użytkownika
-    QString searchTerm = QInputDialog::getText(this, "Search", "Find what:", QLineEdit::Normal, lastSearchTerm, &isConfirmed);
+    // 2. Jeśli kliknął OK i coś wpisał
+    if (ok && !searchTerm.isEmpty()) {
+        lastSearchTerm = searchTerm; // Aktualizujesz zmienną w MainWindow
 
-    // Sprawdzamy, czy użytkownik zatwierdził (OK) i czy wpisał cokolwiek
-    if (isConfirmed && !searchTerm.isEmpty()) {
-        TextTools::findText(this, ui->noteText, searchTerm);
+        // 3. Wywołujesz swoją funkcję z TextTools
+        // Każde kliknięcie "szukaj" i Enter teraz znajdzie następną "sigmę"
+        TextTools::findText(this, ui->noteText, lastSearchTerm);
     }
 }
-
 
 void MainWindow::on_settings_triggered()
 {

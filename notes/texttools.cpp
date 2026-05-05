@@ -72,14 +72,14 @@ void TextTools::findAndReplace(QMainWindow *parent, QPlainTextEdit *editor) {
     bool isConfirmed;
 
     // Pobieramy frazę, którą chcemy zmienić
-    QString currentText = QInputDialog::getText(parent, "Replace All",
-                                                "Text to find:", QLineEdit::Normal,
+    QString currentText = QInputDialog::getText(parent, "Znajdź",
+                                                "Znajdź tekst", QLineEdit::Normal,
                                                 "", &isConfirmed);
     if (!isConfirmed || currentText.isEmpty()) return;
 
     // Pobieramy frazę docelową
-    QString targetText = QInputDialog::getText(parent, "Replace All",
-                                               "Replace with:", QLineEdit::Normal,
+    QString targetText = QInputDialog::getText(parent, "Zamień",
+                                               "Zamień na", QLineEdit::Normal,
                                                "", &isConfirmed);
     if (!isConfirmed) return;
 

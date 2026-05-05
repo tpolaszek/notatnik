@@ -38,12 +38,7 @@ private slots:
     void on_settings_triggered();
     void on_FindAndReplace_triggered();
 
-    void on_Preview_triggered();
-
-    void on_Edit_triggered();
-
     void fillRecentMenu();
-
     void on_closeFile_triggered();
 
 private:
