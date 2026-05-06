@@ -3,12 +3,14 @@
 #include "settingsmanager.h"
 #include "texttools.h"
 #include "settingsdialog.h"
+#include "viewmanager.h"
 #include <QFileDialog>
 #include <QTextStream>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QInputDialog>
 #include <QToolButton>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -58,6 +60,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
 
     viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
+
+    // Tabulacja te 2 linijki (reszta znajduje się w viewManager)
+    ui->noteText->installEventFilter(this);
+    viewManager->setupEditorVisuals(ui->noteText);
+
 }
 
 MainWindow::~MainWindow()

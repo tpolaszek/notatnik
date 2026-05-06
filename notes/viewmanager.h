@@ -3,18 +3,24 @@
 
 #include <QPlainTextEdit>
 #include <QStatusBar>
+#include <QObject>
 
-class ViewManager {
+class ViewManager : public QObject {
+    Q_OBJECT
+
 public:
-    ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar);
+    ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar, QObject *parent = nullptr);
 
-    void switchToEdit();    // Tryb edycji
-    void switchToPreview(); // Tryb podglądu (tylko do odczytu)
+    void switchToEdit();
+    void switchToPreview();
+    void setupEditorVisuals(QPlainTextEdit *editor);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     QPlainTextEdit *m_editor;
     QPlainTextEdit *m_lineCounter;
     QStatusBar *m_statusBar;
+    const int m_tabSize = 4;
 
     void applyStyles(bool isEditing);
 };
