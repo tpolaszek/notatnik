@@ -19,16 +19,15 @@ QString FileHandling::openFile(const QString &filePath) {
 
 // Metoda pobiera ścieżkę otwartego pliku
 QString FileHandling::getOpenFilePath(QWidget *parent){
-    return QFileDialog::getOpenFileName(parent,
-                                        "Otwórz plik",
-                                        QDir::homePath(),
-                                        "Wszystkie obsługiwane (*.txt *.html *.cpp *.h *.py);;"
-                                        "Pliki tekstowe (*.txt);;"
-                                        "HTML (*.html);;"
-                                        "C++ (*.cpp *.h);;"
-                                        "Python (*.py *.pyw)"
-                                        );
+    return QFileDialog::getOpenFileName(parent, "Otwórz plik", QDir::homePath(),
+    "Wszystkie obsługiwane (*.txt *.html *.cpp *.h *.py);;"
+    "Pliki tekstowe (*.txt);;"
+    "HTML (*.html);;"
+    "C++ (*.cpp *.h);;"
+    "Python (*.py *.pyw)");
 }
+
+// Metoda zapisuje plik do przekazanej ścieżki
 bool FileHandling::saveFile(const QString &filePath, const QString &content){
     QFile file(filePath);
     if(!file.open(QFile::WriteOnly | QFile::Text))return false;
@@ -39,6 +38,12 @@ bool FileHandling::saveFile(const QString &filePath, const QString &content){
     return true;
 }
 
+// Pobiera ścieżke pliku
 QString FileHandling::getSaveFilePath(QWidget *parent){
-    return QFileDialog::getSaveFileName(parent, "Zapisz jako", "", "Pliki tekstowe (*.txt);;HTML (*.html);;Wszystkie pliki (*)");
+    return QFileDialog::getSaveFileName(parent, "Zapisz jako", "",
+    "Wszystkie obsługiwane (*.txt *.html *.cpp *.h *.py);;"
+    "Pliki tekstowe (*.txt);;"
+    "HTML (*.html);;"
+    "C++ (*.cpp *.h);;"
+    "Python (*.py *.pyw)");
 }

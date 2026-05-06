@@ -107,7 +107,7 @@ void MainWindow::openFileFromPath(const QString &filePath){
 }
 
 void MainWindow::recordAndRefresh(const QString &filePath) {
-    recentMgr.recordFile(filePath);  // dot not arrow, it's a value now
+    recentMgr.recordFile(filePath);
 }
 
 void MainWindow::fillRecentMenu(){

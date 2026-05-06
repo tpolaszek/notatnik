@@ -7,8 +7,9 @@ RecentFilesManager::RecentFilesManager(QObject *parent) : QObject(parent) {
     load();
 }
 
+// zapisuje otwarte poprzednio pliki
 void RecentFilesManager::recordFile(const QString &filePath) {
-    if(filePath.isEmpty()) return;
+    if(filePath.isEmpty()) return; // jeśli nie ma tego pliku nic nie zwraca
 
     for(int i = 0; i<files.size(); ++i){
         if(files[i].path == filePath){
@@ -19,32 +20,37 @@ void RecentFilesManager::recordFile(const QString &filePath) {
 
     RecentFile rf;
     rf.path = filePath;
-    QFileInfo info(filePath);
+    QFileInfo info(filePath); // informacje o pliku
 
+    // jeśli istnieją informacje o pliku
     if(info.exists()){
-        rf.lastModified = info.lastModified();
+        rf.lastModified = info.lastModified(); // ostatni plik ma informacje sprawdzanego pliku
     } else {
-        rf.lastModified = QDateTime::currentDateTime();
+        rf.lastModified = QDateTime::currentDateTime(); // jeśli nie ma informacji to dodaje aktualną date i czas
     }
 
-    files.prepend(rf);
+    files.prepend(rf); // dodaje na początku listy ostatni plik
 
+    // jeśli ilość plików na liście jest większa od maksymalnej ilości
     while(files.size() > MaxEntries){
-        files.removeLast();
+        files.removeLast(); // usuwa ostatnie pliki z listy
     }
 
     save();
 }
 
+// Metoda zwraca liste ostatnich plików
 QList<RecentFile> RecentFilesManager::recentFiles() const{
     return files;
 }
 
+// Ładuje ostatnie pliki
 void RecentFilesManager::load(){
-    QSettings s("nazwa", "Notatnik");
+    QSettings s("UstawienieOstatniePliki", "Notatnik");
     int count = s.beginReadArray("recentFiles");
-    files.clear();
+    files.clear(); // czyści liste plików
 
+    // Póki i jest mnieszcze od ilości plików
     for(int i = 0; i<count; ++i){
         s.setArrayIndex(i);
         RecentFile rf;
@@ -52,11 +58,12 @@ void RecentFilesManager::load(){
         rf.lastModified = s.value("lastModified").toDateTime();
         if(!rf.path.isEmpty()) files.append(rf);
     }
-    s.endArray();
+    s.endArray(); // zamknij tablice
 }
 
+// Zapisuje ostatnie pliki
 void RecentFilesManager::save() const{
-    QSettings s("nazwa","Notatnik");
+    QSettings s("UstawienieOstatniePliki","Notatnik");
     s.beginWriteArray("recentFiles", files.size());
 
     for(int i = 0; i< files.size(); ++i){

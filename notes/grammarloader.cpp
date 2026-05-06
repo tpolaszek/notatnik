@@ -9,12 +9,11 @@ void GrammarLoader::loadFromDirectory(const QString& dirPath) {
     QDir dir(dirPath);
     const QStringList jsonFiles = dir.entryList({"*.json"}, QDir::Files);
 
-    //Otwieranie plików i obsługa błędów
+    // Otwieranie plików i obsługa błędów
     for(const QString& fileName : jsonFiles){
         QString fullPath = dirPath + "/" + fileName;
-        qDebug() << "Trying to open:" << fullPath;
         QFile file(fullPath);
-        qDebug() << "File exists:" << file.exists();
+
         if(!file.open(QFile::ReadOnly)){
             qDebug() << "Failed to open:" << file.errorString();
             continue;
@@ -29,6 +28,8 @@ void GrammarLoader::loadFromDirectory(const QString& dirPath) {
 
         // Mapa do rozszerzeń plików które będą obsługiwane przez program
         QJsonArray exts = grammar["extensions"].toArray();
+
+        // Dla każdego rozszerzenia dodaje do mapy dodaje zasady podkreślania sładni
         for(const QJsonValue& ext : exts){
             extensionMap[ext.toString()] = grammar;
         }
