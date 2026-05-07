@@ -50,7 +50,7 @@ void RecentFilesManager::load(){
     int count = s.beginReadArray("recentFiles");
     files.clear(); // czyści liste plików
 
-    // Póki i jest mnieszcze od ilości plików
+    // Póki i jest mniejsze od ilości plików
     for(int i = 0; i<count; ++i){
         s.setArrayIndex(i);
         RecentFile rf;

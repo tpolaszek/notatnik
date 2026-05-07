@@ -16,6 +16,7 @@ SOURCES += \
     recentfilesmanager.cpp \
     settingsdialog.cpp \
     settingsmanager.cpp \
+    startscreen.cpp \
     syntaxhighlighter.cpp \
     texttools.cpp \
     viewmanager.cpp
@@ -27,13 +28,15 @@ HEADERS += \
     recentfilesmanager.h \
     settingsdialog.h \
     settingsmanager.h \
+    startscreen.h \
     syntaxhighlighter.h \
     texttools.h \
     viewmanager.h
 
 FORMS += \
     mainwindow.ui \
-    settings.ui
+    settings.ui \
+    startscreen.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
