@@ -31,13 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Ustawia wielkość przycisku i ikony w nim zawartej
     viewMode->setIconSize(QSize(32, 32));
-    viewMode->setFixedSize(QSize(32, 32));
+    viewMode->setFixedSize(QSize(36, 36));
 
     // Przycisk pokazuje się w prawym górnym rogu menuBara
     menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
 
-    // Ustawienie przezroczystego tła dla przycisku
-    viewMode->setStyleSheet("QToolButton { border: none; background: transparent; }" "QToolButton:hover { background: rgba(255,255,255,30); border-radius: 4px; }");
+    // Ustawienie szaregp tła dla przycisku, dlatego że czarne ikony zlewają się z tłem
+    viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: #858585; }" "QToolButton:hover { background: #696868; border-radius: 4px; }");
 
     bool *isPreview = new bool(false); // przechowuje stan wyświetlania
     connect(viewMode, &QToolButton::clicked, this, [this, viewMode, isPreview]() {
