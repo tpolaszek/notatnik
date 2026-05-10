@@ -14,6 +14,8 @@ public:
     void switchToEdit();
     void switchToPreview();
     void setupEditorVisuals(QPlainTextEdit *editor);
+
+protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
@@ -22,6 +24,7 @@ private:
     QStatusBar *m_statusBar;
     const int m_tabSize = 4;
 
+    bool handleSmartKeys(QKeyEvent *keyEvent, QPlainTextEdit *editor);
     void applyStyles(bool isEditing);
 };
 

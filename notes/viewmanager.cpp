@@ -39,41 +39,74 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     // Wyłączenie łamania linii (wymusza poziomy pasek przewijania)
     editor->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
-// 2. DZIAŁANIE: Tu dzieje się tabulacja (uruchamia się ZA KAŻDYM RAZEM, gdy dotkniesz klawiatury)
 bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
-    // Reaguj tylko na naciśnięcie klawisza
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (event->type() != QEvent::KeyPress) return QObject::eventFilter(obj, event);
 
-        // Specjalna obsługa klawisza TAB
-        if (keyEvent->key() == Qt::Key_Tab) {
-            QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(obj);
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(obj);
+    if (!editor) return false;
 
-            // Jeśli użytkownik zaznaczył tekst, przesuń blok zamiast go usuwać
-            if (editor && editor->textCursor().hasSelection()) {
-                QTextCursor cursor = editor->textCursor();
-                int start = cursor.selectionStart();
-                int end = cursor.selectionEnd();
-
-                cursor.beginEditBlock(); // Grupuje zmiany dla funkcji "Cofnij" (Ctrl+Z)
-
-                cursor.setPosition(start);
-                cursor.movePosition(QTextCursor::StartOfBlock);
-
-                // Wstawianie spacji na początku każdej linii w zaznaczeniu
-                while (cursor.position() < end) {
-                    cursor.insertText("    ");
-                    if (!cursor.movePosition(QTextCursor::NextBlock)) break;
-                    end += 4; // Korekta zakresu po dodaniu znaków
-                }
-
-                cursor.endEditBlock();
-                return true; // Blokuje standardowe usunięcie tekstu przez Qt
-            }
+    // 1. Obsługa TAB (Zaznaczenie tekstu)
+    if (keyEvent->key() == Qt::Key_Tab && editor->textCursor().hasSelection()) {
+        QTextCursor cursor = editor->textCursor();
+        int start = cursor.selectionStart(), end = cursor.selectionEnd();
+        cursor.beginEditBlock();
+        cursor.setPosition(start);
+        cursor.movePosition(QTextCursor::StartOfBlock);
+        while (cursor.position() < end) {
+            cursor.insertText("    ");
+            if (!cursor.movePosition(QTextCursor::NextBlock)) break;
+            end += 4;
         }
+        cursor.endEditBlock();
+        return true;
     }
-    // Pozostałe klawisze obsługuj normalnie
+
+    // 2. Obsługa Inteligentnych klawiszy (Enter, Backspace, Nawiasy)
+    if (handleSmartKeys(keyEvent, editor)) return true;
+
     return QObject::eventFilter(obj, event);
+}
+
+bool ViewManager::handleSmartKeys(QKeyEvent *keyEvent, QPlainTextEdit *editor) {
+    QTextCursor cursor = editor->textCursor();
+    int pos = cursor.position();
+    int key = keyEvent->key();
+    QString opens = "([{", closes = ")]}";
+
+    QChar left = editor->document()->characterAt(pos - 1);
+    QChar right = editor->document()->characterAt(pos);
+    int idxL = opens.indexOf(left);
+
+    // --- CASE A: BACKSPACE (Usuwanie pary) ---
+    if (key == Qt::Key_Backspace && idxL != -1 && right == closes.at(idxL)) {
+        cursor.beginEditBlock();
+        cursor.deleteChar();
+        cursor.deletePreviousChar();
+        cursor.endEditBlock();
+        return true;
+    }
+
+    // --- CASE B: ENTER (Rozbijanie klamer) ---
+    if ((key == Qt::Key_Return || key == Qt::Key_Enter) && idxL != -1 && right == closes.at(idxL)) {
+        cursor.beginEditBlock();
+        cursor.insertText("\n    \n");
+        cursor.movePosition(QTextCursor::Left);
+        editor->setTextCursor(cursor);
+        cursor.endEditBlock();
+        return true;
+    }
+
+    // --- CASE C: WPISYWANIE (Domykanie) ---
+    int idxKey = opens.indexOf(keyEvent->text());
+    if (idxKey != -1 && !keyEvent->text().isEmpty()) {
+        cursor.insertText(keyEvent->text() + closes.at(idxKey));
+        cursor.movePosition(QTextCursor::Left);
+        editor->setTextCursor(cursor);
+        return true;
+    }
+
+    return false;
 }
 
 void ViewManager::switchToEdit() { applyStyles(true); }

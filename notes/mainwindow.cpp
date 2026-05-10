@@ -59,10 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     recentMenu = ui->menuOstatnioOtwarte;
     connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
 
-    viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
 
-    // Tabulacja te 2 linijki (reszta znajduje się w viewManager)
-    ui->noteText->installEventFilter(this);
+    viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
     viewManager->setupEditorVisuals(ui->noteText);
 
 }
