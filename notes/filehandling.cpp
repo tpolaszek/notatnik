@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 // Metoda otwiera plik
 QString FileHandling::openFile(const QString &filePath) {
     QFile file(filePath);
@@ -46,4 +47,24 @@ QString FileHandling::getSaveFilePath(QWidget *parent){
     "HTML (*.html);;"
     "C++ (*.cpp *.h);;"
     "Python (*.py *.pyw)");
+}
+
+FileHandling::SaveResult FileHandling::checkSaveStatus(QWidget *parent, QPlainTextEdit *editor) {
+    if (!editor->document()->isModified()) {
+        return SaveResult::NoChanges;
+    }
+
+    QMessageBox msgBox(QMessageBox::Warning, "Notatnik",
+                       "Dokument został zmodyfikowany.\nCzy chcesz zapisać zmiany?",
+                       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, parent);
+
+    msgBox.setButtonText(QMessageBox::Save, "Zapisz");
+    msgBox.setButtonText(QMessageBox::Discard, "Nie zapisuj");
+    msgBox.setButtonText(QMessageBox::Cancel, "Anuluj");
+
+    int ret = msgBox.exec();
+
+    if (ret == QMessageBox::Save)    return SaveResult::SaveRequested;
+    if (ret == QMessageBox::Cancel)  return SaveResult::CancelAction;
+    return SaveResult::DiscardChanges;
 }

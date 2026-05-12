@@ -163,7 +163,10 @@ void MainWindow::on_saveFile_triggered()
     if (currentFilePath.isEmpty()) {
         on_saveFileAs_triggered();
     } else {
-        FileHandling::saveFile(currentFilePath, ui->noteText->toPlainText());
+        if (FileHandling::saveFile(currentFilePath, ui->noteText->toPlainText())) {
+            // Resetujemy flagę - to mówi programowi, że zmiany zostały zapisane
+            ui->noteText->document()->setModified(false);
+        }
     }
 }
 
@@ -177,6 +180,8 @@ void MainWindow::on_saveFileAs_triggered()
         setTitle(currentFilePath);
         applyHighlighter(currentFilePath);
         recordAndRefresh(currentFilePath);
+        // Resetujemy flagę po zapisaniu nowego pliku
+        ui->noteText->document()->setModified(false);
     }
 }
 
@@ -216,4 +221,26 @@ void MainWindow::on_closeFile_triggered()
     ui->noteText->clear();
     currentFilePath = QString();
     this->setWindowTitle("Notatnik");
+}
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // Wywołujemy Twoją funkcję sprawdzającą
+    if (proceedWithSafetyCheck()) {
+        event->accept(); // Pozwól na zamknięcie okna
+    } else {
+        event->ignore(); // Zatrzymaj zamykanie okna (użytkownik kliknął Cancel)
+    }
+}
+bool MainWindow::proceedWithSafetyCheck() {
+    // 1. Pytamy "robota od plików", co sądzi o sytuacji
+    FileHandling::SaveResult result = FileHandling::checkSaveStatus(this, ui->noteText);
+
+    // 2. Jeśli użytkownik chce zapisać, odpalamy Twoją gotową funkcję
+    if (result == FileHandling::SaveResult::SaveRequested) {
+        on_saveFile_triggered();
+        // Jeśli po zapisie nadal jest "modified" (bo np. zamknął okno Save As), przerywamy
+        return !ui->noteText->document()->isModified();
+    }
+
+    // 3. Jeśli Cancel - zwracamy false (nie idź dalej). Jeśli Discard - true (idź dalej).
+    return (result != FileHandling::SaveResult::CancelAction);
 }

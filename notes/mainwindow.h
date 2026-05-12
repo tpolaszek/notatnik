@@ -41,6 +41,11 @@ private slots:
     void fillRecentMenu();
     void on_closeFile_triggered();
 
+    bool proceedWithSafetyCheck();
+
+protected:
+    void closeEvent(QCloseEvent *event) override; // Przechwytuje zdarzenie zamknięcia
+
 private:
     void applyHighlighter(const QString &filePath);
     void recordAndRefresh(const QString &filePath);
