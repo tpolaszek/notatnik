@@ -9,7 +9,6 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dictionary.cpp \
     filehandling.cpp \
     grammarloader.cpp \
     main.cpp \
@@ -23,7 +22,6 @@ SOURCES += \
     viewmanager.cpp
 
 HEADERS += \
-    dictionary.h \
     filehandling.h \
     grammarloader.h \
     mainwindow.h \

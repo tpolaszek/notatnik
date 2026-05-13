@@ -13,18 +13,18 @@ StartScreen::StartScreen(MainWindow *mainWindow, QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->setWindowFlag(Qt::FramelessWindowHint);
+    this->setWindowFlag(Qt::FramelessWindowHint); // ukrywa systemowy titlebar
     setWindowTitle("Notatnik");
     setWindowIcon(QIcon(":/icons/note_icon.png"));
 
-    QWidget *titleBar = new QWidget(this);
+    QWidget *titleBar = new QWidget(this); // tworzy nowy widget który zastępuje ukryty wcześniej titlebar
     titleBar->setFixedHeight(35);
-    titleBar->setGeometry(0, 0, width(), 35);
+    titleBar->setGeometry(0, 0, width(), 35); // sprawia że pasek jest na długość okna
 
-    QHBoxLayout *titleLayout = new QHBoxLayout(titleBar);
+    QHBoxLayout *titleLayout = new QHBoxLayout(titleBar); // layout paska który sprawia że X jest z lewej strony
     titleLayout->setContentsMargins(10, 0, 0, 0);
 
-    QPushButton *closeBtn = new QPushButton();
+    QPushButton *closeBtn = new QPushButton(); // tworzy przycisk zamykający aplikacje
 
     closeBtn->setIcon(QIcon(":/icons/close.png"));
     closeBtn->setFixedSize(35, 35);
@@ -40,12 +40,12 @@ StartScreen::StartScreen(MainWindow *mainWindow, QWidget *parent)
         QPushButton:hover { background: #fc3e30; }
     )");
 
-    titleLayout->addStretch();
-    titleLayout->addWidget(closeBtn);
+    titleLayout->addStretch(); // dodaje rozszerzalną przestrzeń
+    titleLayout->addWidget(closeBtn); // dodaje przycisk do layoutu
 
-    ui->mainHorizontalLayout->setContentsMargins(20, 35, 10, 10);
+    ui->mainHorizontalLayout->setContentsMargins(20, 35, 10, 10); // dodaje marginesy do głównego layoutu
 
-    connect(closeBtn, &QPushButton::clicked, this, &QWidget::close);
+    connect(closeBtn, &QPushButton::clicked, this, &QWidget::close); // łączy akcje naciśnięcia przycisku z zamykaniem aplikacji
 
     populateRecentFilesList();
     connect(ui->pushButton, &QPushButton::clicked, this, &StartScreen::onCreateFileClicked);
