@@ -31,3 +31,12 @@ QStatusBar {
     background-color: #1e1e1e;
     color: #aaaaaa;
 }
+
+QLabel{
+    color: #ffffff;
+}
+
+QListWidget {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}

@@ -26,10 +26,16 @@ private slots:
 
 private:
     void populateRecentFilesList();
+    QWidget *titleBar = nullptr;
 
     MainWindow *mainWindow;
     Ui::StartScreen *ui;
     RecentFilesManager recentMgr;
+    QPoint dragPos;
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 };
 
 #endif // STARTSCREEN_H

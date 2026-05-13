@@ -12,5 +12,6 @@
         <file>icons/preview.png</file>
         <file>icons/edit.png</file>
         <file>icons/note_icon.png</file>
+        <file>icons/close.png</file>
     </qresource>
 </RCC>
