@@ -11,5 +11,6 @@
     <qresource prefix="/">
         <file>icons/preview.png</file>
         <file>icons/edit.png</file>
+        <file>icons/note_icon.png</file>
     </qresource>
 </RCC>

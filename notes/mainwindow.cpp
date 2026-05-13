@@ -10,7 +10,7 @@
 #include <QStandardPaths>
 #include <QInputDialog>
 #include <QToolButton>
-
+#include <QIcon>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
     });
+    // Tą ikonę trzeba zmienić na coś lepszego
+    setWindowIcon(QIcon(":/icons/note_icon.png"));
 
     auto *viewMode = new QToolButton(this);
     viewMode->setIcon(QIcon(":/icons/preview.png"));

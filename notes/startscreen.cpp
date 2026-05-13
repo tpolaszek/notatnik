@@ -9,6 +9,7 @@ StartScreen::StartScreen(MainWindow *mainWindow, QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("Notatnik");
+    setWindowIcon(QIcon(":/icons/note_icon.png"));
 
     populateRecentFilesList();
 
