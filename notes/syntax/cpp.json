@@ -27,7 +27,7 @@
     {
       "name": "entity.name.function",
       "pattern": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()",
-      "color": "#DCDCAA"
+      "color": "#e8903c"
     },
     {
       "name": "meta.preprocessor",
@@ -36,7 +36,7 @@
     },
     {
       "name": "string.quoted",
-      "pattern": "\"[^\"]*\"|'[^']*'",
+      "pattern": "\"[^\"]*\"|'[^']*'|<[^>]*>",
       "color": "#CE9178"
     },
     {

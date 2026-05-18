@@ -49,22 +49,26 @@ void TextTools::applyDynamicWidth(int totalLines, QPlainTextEdit *lineCounter) {
 void TextTools::findText(QMainWindow *parent, QPlainTextEdit *editor, QString &lastSearch) {
     if (lastSearch.isEmpty()) return;
 
-    // Próbujemy znaleźć tekst od aktualnej pozycji kursora
+    // 1. Szukamy od aktualnej pozycji kursora w dół
     bool found = editor->find(lastSearch);
 
-    // Jeśli nie znaleziono nic dalej, spróbuj szukać od początku dokumentu (loop)
+    // 2. Jeśli nie znaleziono nic dalej, spróbuj szukać od początku dokumentu (loop)
     if (!found) {
-        // Przesuń kursor na początek
         editor->moveCursor(QTextCursor::Start);
         found = editor->find(lastSearch);
+
+        // Jeśli znaleziono po powrocie na początek, czyścimy stary pasek stanu
+        if (found) {
+            parent->statusBar()->clearMessage();
+        }
     }
 
-    // Jeśli nadal nie znaleziono (słowa w ogóle nie ma w tekście)
+    // 3. Jeśli po przeszukaniu od początku nadal nic nie ma -> słowo nie istnieje w pliku
     if (!found) {
-        // Możesz dodać proste powiadomienie na pasku stanu (StatusBar)
         parent->statusBar()->showMessage("Nie znaleziono: " + lastSearch, 2000);
     }
 }
+
 void TextTools::findAndReplace(QMainWindow *parent, QPlainTextEdit *editor) {
     if (!editor || !parent) return;
 
@@ -100,4 +104,27 @@ void TextTools::findAndReplace(QMainWindow *parent, QPlainTextEdit *editor) {
     } else {
         parent->statusBar()->showMessage("No matches found.", 3000);
     }
+}
+
+int TextTools::getCount(QPlainTextEdit *editor, const QString &searchTerm) {
+    if (!editor || searchTerm.isEmpty()) return 0;
+
+    int count = 0;
+
+    // 1. Tworzymy niezależny kursor ustawiony na początku dokumentu,
+    // dzięki temu operacja odbywa się w tle i nie rusza kursora użytkownika.
+    QTextDocument *doc = editor->document();
+    QTextCursor cursor(doc);
+
+    // 2. Przeszukujemy dokument za pomocą wirtualnego kursora
+    while (!cursor.isNull() && !cursor.atEnd()) {
+        // doc->find zwraca nowy kursor ustawiony na znalezionym słowie
+        cursor = doc->find(searchTerm, cursor);
+
+        if (!cursor.isNull()) {
+            count++; // Znaleziono wystąpienie
+        }
+    }
+
+    return count; // Zwracamy łączną ilość znalezionych słów
 }

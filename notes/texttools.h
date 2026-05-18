@@ -13,6 +13,8 @@ public:
     static void findText(QMainWindow *parent, QPlainTextEdit *editor, QString &lastSearch);
     static void findAndReplace(QMainWindow *parent, QPlainTextEdit *editor);
     static void applyDynamicWidth(int lineCount, QPlainTextEdit *lineCounter);
+    static int getCount(QPlainTextEdit *editor, const QString &searchTerm);
+
 };
 
 #endif // TEXTTOOLS_H
