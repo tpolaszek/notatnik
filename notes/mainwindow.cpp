@@ -190,18 +190,30 @@ void MainWindow::on_saveFileAs_triggered()
 
 void MainWindow::on_Find_triggered()
 {
+
     bool ok;
-    // 1. Pobierasz tekst (podpowiada ostatnio szukane słowo)
-    QString searchTerm = QInputDialog::getText(this, "Szukaj", "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
+    int counter = 0;
 
-    // 2. Jeśli kliknął OK i coś wpisał
-    if (ok && !searchTerm.isEmpty()) {
-        lastSearchTerm = searchTerm; // Aktualizujesz zmienną w MainWindow
+    do {
+        int totalMatches = TextTools::getCount(ui->noteText, lastSearchTerm);
 
-        // 3. Wywołujesz swoją funkcję z TextTools
-        // Każde kliknięcie "szukaj" i Enter teraz znajdzie następną "sigmę"
-        TextTools::findText(this, ui->noteText, lastSearchTerm);
-    }
+        // 1. Pokazujemy Twoje standardowe okienko
+        QString searchTerm = QInputDialog::getText(this, "Szukaj (" + QString::number(counter) + "/" + QString::number(totalMatches) + ")", "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
+
+        // 2. Jeśli użytkownik kliknął OK i tekst nie jest pusty
+        if (ok && !searchTerm.isEmpty()) {
+            counter++;
+            lastSearchTerm = searchTerm;
+
+            // 3. Wywołujemy Twoje szukanie z TextTools
+            TextTools::findText(this, ui->noteText, lastSearchTerm);
+
+            // Wymuszamy, aby Qt odświeżyło edytor i pokazało podświetlone słowo zanim otworzy kolejne okno
+            ui->noteText->repaint();
+        }
+        if(counter > totalMatches) counter = 1;
+    } while (ok && ui->noteText->textCursor().hasSelection());
+    // Pętla działa tak długo, jak klikasz OK i program znajduje kolejne słowa
 }
 
 void MainWindow::on_settings_triggered()
