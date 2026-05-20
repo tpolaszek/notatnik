@@ -193,12 +193,12 @@ void MainWindow::on_Find_triggered()
 
     bool ok;
     int counter = 0;
-
     do {
         int totalMatches = TextTools::getCount(ui->noteText, lastSearchTerm);
+        QString count = "(" + QString::number(counter) + "/" + QString::number(totalMatches) + ")";
 
         // 1. Pokazujemy Twoje standardowe okienko
-        QString searchTerm = QInputDialog::getText(this, "Szukaj (" + QString::number(counter) + "/" + QString::number(totalMatches) + ")", "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
+        QString searchTerm = QInputDialog::getText(this, "Szukaj " + count, "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
 
         // 2. Jeśli użytkownik kliknął OK i tekst nie jest pusty
         if (ok && !searchTerm.isEmpty()) {

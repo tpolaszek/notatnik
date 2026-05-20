@@ -23,7 +23,10 @@ QStringList SettingsManager::availableThemes() const {
 QString SettingsManager::currentThemePath() const {
     return themePath;
 }
-
+void SettingsManager::setDefaultTheme(){
+    const QString defaultDir = "./themes/dark.css";
+    if(QFile::exists(defaultDir)) themePath = defaultDir;
+}
 // Ustawia motyw
 void SettingsManager::setThemePath(const QString &path) {
     themePath = path;
@@ -51,6 +54,8 @@ void SettingsManager::load() {
     QSettings s("Ustawienie", "Notatnik");
     themePath = s.value("theme/path", QString()).toString();
     defaultfontSize = s.value("editor/fontSize", 12).toInt();
+
+    if (themePath.isEmpty()) setDefaultTheme();
 }
 
 // Zamienia css na utf-8

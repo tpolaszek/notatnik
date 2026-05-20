@@ -13,6 +13,7 @@ public:
 
     QStringList availableThemes() const;
     QString currentThemePath() const;
+    void setDefaultTheme();
     void setThemePath(const QString &path);
 
     int fontSize() const;
