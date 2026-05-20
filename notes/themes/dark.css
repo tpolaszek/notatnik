@@ -1,4 +1,4 @@
-QMainWindow, QDialog {
+QMainWindow, QDialog, QWidget {
     background-color: #1e1e1e;
     color: #ffffff;
 }
@@ -34,9 +34,45 @@ QStatusBar {
 
 QLabel{
     color: #ffffff;
+    background-color: transparent;
 }
 
 QListWidget {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #333333;
+}
+
+QPushButton {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #444444;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+QPushButton:hover {
+    background-color: #3a3a3a;
+}
+
+QPushButton:pressed {
+    background-color: #0057ae;
+}
+
+QTabWidget::pane {
+    border: 1px solid #333333;
+    background-color: #1e1e1e;
+}
+
+QTabBar::tab {
+    background-color: #2d2d2d;
+    color: #aaaaaa;
+    padding: 5px 12px;
+    border: 1px solid #333333;
+    border-bottom: none;
+}
+
+QTabBar::tab:selected {
     background-color: #1e1e1e;
     color: #ffffff;
 }
