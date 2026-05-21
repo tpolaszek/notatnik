@@ -12,6 +12,8 @@ class ViewManager : public QObject {
 public:
     ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar, QObject *parent = nullptr);
 
+    void applyFontSize(int pointSize);
+
     void switchToEdit();
     void switchToPreview();
     void setupEditorVisuals(QPlainTextEdit *editor);

@@ -5,10 +5,8 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
-SettingsDialog::SettingsDialog(SettingsManager *manager, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::SettingsWindow)
-    , manager(manager)
+SettingsDialog::SettingsDialog(SettingsManager *manager, ViewManager *viewManager, QWidget *parent)
+    : QDialog(parent), ui(new Ui::SettingsWindow), manager(manager), viewManager(viewManager)
 {
     ui->setupUi(this);
 
@@ -83,7 +81,8 @@ void SettingsDialog::onBrowseClicked() {
 void SettingsDialog::onApplyClicked() {
     manager->setFontSize(ui->fontSizeBox->value()); // zmienia czcionke na podaną w fontSizeBox
     manager->save(); // zapisuje ustawienia
-    manager->applyToApp(); // Aplikuje zmienone ustawienia
+    manager->applyToApp(); // Aplikuje zmienione ustawienia
+    viewManager->applyFontSize(manager->fontSize());
 }
 
 // Po kliknięciu OK zamyka okno bez zapisywania zmian

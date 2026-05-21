@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QListWidgetItem>
+#include "viewmanager.h"
 
 namespace Ui {
 class SettingsWindow;
@@ -14,12 +15,13 @@ class SettingsDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(SettingsManager *manager, QWidget *parent = nullptr);
+    explicit SettingsDialog(SettingsManager *manager, ViewManager *viewManager, QWidget *parent = nullptr);
     ~SettingsDialog();
 
 private:
     Ui::SettingsWindow *ui;
     SettingsManager *manager;
+    ViewManager *viewManager;
 
     void populateThemeList();
     void selectCurrentTheme();

@@ -21,6 +21,22 @@ void ViewManager::applyStyles(bool isEditing) {
         m_statusBar->showMessage("Tryb: przeglądania");
     }
 }
+
+void ViewManager::applyFontSize(int pointSize){
+    QFont font = m_editor->font();
+
+    font.setPointSize(pointSize);
+
+    m_editor->setFont(font); // ustawia wielkość czcionki do edytora
+    m_lineCounter->setFont(font); // ustawia wielkość czcionki do licznika liń
+
+    QFontMetrics metrics(font);
+    m_editor->setTabStopDistance(m_tabSize * metrics.horizontalAdvance(' ')); // ustawia odległość tabulatora
+
+    int totalLines = m_editor->document()->blockCount();
+    TextTools::applyDynamicWidth(totalLines, m_lineCounter);
+}
+
 // INSTRUKCJA: Tu ustawiamy "wygląd i zasady" (uruchamia się TYLKO RAZ przy starcie)
 void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     if (!editor) return;
@@ -30,6 +46,7 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     font.setStyleHint(QFont::Monospace);
     font.setPointSize(11);
     editor->setFont(font);
+    m_lineCounter->setFont(font);
 
     // Przeliczenie szerokości Tab na dokładnie 4 spacje (w pikselach)
     QFontMetrics metrics(font);
@@ -41,6 +58,7 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     // Wyłączenie łamania linii (wymusza poziomy pasek przewijania)
     editor->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
+
 bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
     if (event->type() != QEvent::KeyPress) return QObject::eventFilter(obj, event);
 
@@ -150,4 +168,5 @@ bool ViewManager::handleSmartKeys(QKeyEvent *keyEvent, QPlainTextEdit *editor) {
 }
 
 void ViewManager::switchToEdit() { applyStyles(true); }
+
 void ViewManager::switchToPreview() { applyStyles(false); }

@@ -272,7 +272,7 @@ void MainWindow::on_Find_triggered()
 
 void MainWindow::on_settings_triggered()
 {
-    SettingsDialog dlg(settingsManager, this);
+    SettingsDialog dlg(settingsManager, viewManager, this);
     dlg.exec();
 }
 

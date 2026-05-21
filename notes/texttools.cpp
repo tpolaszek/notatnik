@@ -4,17 +4,18 @@
 #include <QInputDialog>
 
 void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
-    lineCounter->setReadOnly(true);                // Tylko do odczytu
+    lineCounter->setReadOnly(true); // tryb tylko do odczytu
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Ukryj suwak
+    lineCounter->setAttribute(Qt::WA_TransparentForMouseEvents, true); //wyłącza wszystki interakcje myszką na liczniku wierszy
 
     // Ustawiamy wyrównanie na poziomie DOKUMENTU
     QTextOption option = lineCounter->document()->defaultTextOption();
     option.setAlignment(Qt::AlignCenter);
     lineCounter->document()->setDefaultTextOption(option);
 
+
     // Łączymy przewijanie edytora z przewijaniem licznika
-    QObject::connect(editor->verticalScrollBar(), &QScrollBar::valueChanged,
-                     lineCounter->verticalScrollBar(), &QScrollBar::setValue);
+    QObject::connect(editor->verticalScrollBar(), &QScrollBar::valueChanged, lineCounter->verticalScrollBar(), &QScrollBar::setValue);
 }
 
 
