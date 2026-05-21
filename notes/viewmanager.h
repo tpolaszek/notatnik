@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QObject>
+#include <QCompleter>
 
 class ViewManager : public QObject {
     Q_OBJECT
@@ -14,6 +15,7 @@ public:
     void switchToEdit();
     void switchToPreview();
     void setupEditorVisuals(QPlainTextEdit *editor);
+    void setCompleter(QCompleter *c) { m_completer = c; } // Szybki setter
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
@@ -22,10 +24,12 @@ private:
     QPlainTextEdit *m_editor;
     QPlainTextEdit *m_lineCounter;
     QStatusBar *m_statusBar;
+    QCompleter *m_completer = nullptr;
     const int m_tabSize = 4;
 
     bool handleSmartKeys(QKeyEvent *keyEvent, QPlainTextEdit *editor);
     void applyStyles(bool isEditing);
+
 };
 
 #endif

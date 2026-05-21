@@ -65,6 +65,48 @@ MainWindow::MainWindow(QWidget *parent)
     viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
     viewManager->setupEditorVisuals(ui->noteText);
 
+    // 1. Tworzymy obiekt słownika i kompletera
+    syntaxDict = new SyntaxDictionary(this);
+    completer = new QCompleter(this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWidget(ui->noteText);
+
+    // ====================================================================
+    // <<< TUTAJ JEST TA KLUCZOWA DOKŁADKA >>>
+    // Podpinamy nasz ViewManager jako filtr zdarzeń bezpośrednio pod okienko podpowiedzi!
+    // Dzięki temu każdy kliknięty TAB/Enter w dymku trafi prosto do naszego eventFilter.
+    completer->popup()->installEventFilter(viewManager);
+    // ====================================================================
+
+    viewManager->setCompleter(completer);
+
+    // <<< TO DOPISZ TUTAJ >>>
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, [this](const QString &completion) {
+        // Pobieramy prefix, który użytkownik zdążył wpisać (np. "pr")
+        QString prefix = completer->completionPrefix();
+
+        // Obliczamy ile liter brakuje (np. dla "print" i "pr" -> brakuje "int")
+        QString toInsert = completion.mid(prefix.length());
+
+        // Wklejamy brakujący tekst do edytora
+        ui->noteText->insertPlainText(toInsert);
+    });
+
+    // 2. ŁĄCZYMY WSZYSTKO W JEDNYM MIEJSCU (Licznik linii + Słownik)
+    connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
+        // Aktualizacja licznika linii
+        TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
+
+        // Wywołanie słownika
+        if (syntaxDict && completer) {
+            syntaxDict->handleTextChange(ui->noteText, completer);
+        }
+    });
+
+    // 3. STARTOWY SŁOWNIK: Żeby działało od razu po włączeniu notatnika
+    syntaxDict->updateLanguageForFile("default.cpp", completer);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +146,10 @@ void MainWindow::openFileFromPath(const QString &filePath){
     setTitle(filePath);
     applyHighlighter(filePath);
     recordAndRefresh(filePath);
+
+    if (syntaxDict && completer) {
+        syntaxDict->updateLanguageForFile(filePath, completer);
+    }
 }
 
 void MainWindow::recordAndRefresh(const QString &filePath) {
@@ -147,6 +193,10 @@ void MainWindow::on_openFile_triggered()
         setTitle(filePath);
         applyHighlighter(filePath);
         recordAndRefresh(filePath);
+        // POPRAWKA: Zamiast fileName przekazujemy filePath
+        if (syntaxDict && completer) {
+            syntaxDict->updateLanguageForFile(filePath, completer);
+        }
     }
 }
 
@@ -182,6 +232,10 @@ void MainWindow::on_saveFileAs_triggered()
         setTitle(currentFilePath);
         applyHighlighter(currentFilePath);
         recordAndRefresh(currentFilePath);
+
+        if (syntaxDict && completer) {
+            syntaxDict->updateLanguageForFile(currentFilePath, completer);
+        }
         // Resetujemy flagę po zapisaniu nowego pliku
         ui->noteText->document()->setModified(false);
     }

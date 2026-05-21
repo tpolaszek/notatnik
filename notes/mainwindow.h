@@ -9,6 +9,9 @@
 #include "settingsdialog.h"
 #include "recentfilesmanager.h"
 #include "viewmanager.h"
+#include <QCompleter>
+#include <QStringListModel>
+#include "syntaxdictionary.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -43,6 +46,7 @@ private slots:
 
     bool proceedWithSafetyCheck();
 
+
 protected:
     void closeEvent(QCloseEvent *event) override; // Przechwytuje zdarzenie zamknięcia
 
@@ -61,6 +65,8 @@ private:
     ViewManager* viewManager;
 
     QMenu *recentMenu = nullptr;
+    QCompleter *completer = nullptr;
+    SyntaxDictionary *syntaxDict = nullptr;;
 };
 
 #endif // MAINWINDOW_H

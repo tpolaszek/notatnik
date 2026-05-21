@@ -17,6 +17,7 @@ SOURCES += \
     settingsdialog.cpp \
     settingsmanager.cpp \
     startscreen.cpp \
+    syntaxdictionary.cpp \
     syntaxhighlighter.cpp \
     texttools.cpp \
     viewmanager.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     settingsdialog.h \
     settingsmanager.h \
     startscreen.h \
+    syntaxdictionary.h \
     syntaxhighlighter.h \
     texttools.h \
     viewmanager.h

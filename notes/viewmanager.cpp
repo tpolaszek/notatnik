@@ -1,5 +1,7 @@
 #include "viewmanager.h"
 #include "texttools.h"
+#include <QCompleter>
+#include <QAbstractItemView>
 
 ViewManager::ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar, QObject *parent)
     : QObject(parent), m_editor(editor), m_lineCounter(lineCounter), m_statusBar(statusBar) {}
@@ -43,23 +45,61 @@ bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
     if (event->type() != QEvent::KeyPress) return QObject::eventFilter(obj, event);
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(obj);
-    if (!editor) return false;
 
-    // 1. Obsługa TAB (Zaznaczenie tekstu)
-    if (keyEvent->key() == Qt::Key_Tab && editor->textCursor().hasSelection()) {
-        QTextCursor cursor = editor->textCursor();
-        int start = cursor.selectionStart(), end = cursor.selectionEnd();
-        cursor.beginEditBlock();
-        cursor.setPosition(start);
-        cursor.movePosition(QTextCursor::StartOfBlock);
-        while (cursor.position() < end) {
-            cursor.insertText("    ");
-            if (!cursor.movePosition(QTextCursor::NextBlock)) break;
-            end += 4;
+    // ====================================================================
+    // KROK 0: OBSŁUGA SŁOWNIKA (Z inteligentną przepustowością)
+    // ====================================================================
+    if (m_completer && m_completer->popup()) {
+
+        // WARUNEK KLUCZOWY: Reagujemy tylko, jeśli dymek jest FIZYCZNIE WIDOCZNY
+        // oraz kompleter ma dla nas jakieś pasujące słowo!
+        bool isPopupActive = m_completer->popup()->isVisible() && !m_completer->currentCompletion().isEmpty();
+
+        if (isPopupActive) {
+            if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+
+                QString currentCompletion = m_completer->currentCompletion();
+                emit m_completer->activated(currentCompletion);
+
+                m_completer->popup()->hide();
+                return true; // Blokujemy spacje/entery TYLKO gdy dymek podpowiadał
+            }
+
+            if (keyEvent->key() == Qt::Key_Escape) {
+                m_completer->popup()->hide();
+                return true;
+            }
         }
-        cursor.endEditBlock();
-        return true;
+    }
+
+    // Rzutowanie na edytor dla standardowych zachowań
+    QPlainTextEdit *editor = qobject_cast<QPlainTextEdit*>(obj);
+    if (!editor) return QObject::eventFilter(obj, event);
+
+    // ====================================================================
+    // 1. STANDARDOWA OBSŁUGA TAB (Działa zawsze, gdy dymek jest zamknięty/pusty)
+    // ====================================================================
+    if (keyEvent->key() == Qt::Key_Tab) {
+        // PRZYPADEK A: Tekst jest zaznaczony -> wcinamy cały blok
+        if (editor->textCursor().hasSelection()) {
+            QTextCursor cursor = editor->textCursor();
+            int start = cursor.selectionStart(), end = cursor.selectionEnd();
+            cursor.beginEditBlock();
+            cursor.setPosition(start);
+            cursor.movePosition(QTextCursor::StartOfBlock);
+            while (cursor.position() < end) {
+                cursor.insertText("    ");
+                if (!cursor.movePosition(QTextCursor::NextBlock)) break;
+                end += 4;
+            }
+            cursor.endEditBlock();
+            return true;
+        }
+        // PRZYPADEK B: Brak zaznaczenia i brak dymka -> wstawiamy standardowe 4 spacje
+        else {
+            editor->insertPlainText("    ");
+            return true;
+        }
     }
 
     // 2. Obsługa Inteligentnych klawiszy (Enter, Backspace, Nawiasy)
