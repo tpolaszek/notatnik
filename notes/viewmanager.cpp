@@ -1,5 +1,6 @@
 #include "viewmanager.h"
 #include "texttools.h"
+#include <QApplication>
 #include <QCompleter>
 #include <QAbstractItemView>
 
@@ -57,6 +58,21 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
 
     // Wyłączenie łamania linii (wymusza poziomy pasek przewijania)
     editor->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    connect(editor, &QPlainTextEdit::cursorPositionChanged, editor, [editor]() {
+        QWidget line;
+        line.setObjectName("currentLineColor");
+        line.setStyleSheet(qApp->styleSheet());
+        line.ensurePolished();
+        QColor color = line.palette().color(QPalette::Window);
+
+        QTextEdit::ExtraSelection selection;
+        selection.format.setBackground(color);
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+        selection.cursor = editor->textCursor();
+        selection.cursor.clearSelection();
+        editor->setExtraSelections({selection});
+    });
 }
 
 bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
