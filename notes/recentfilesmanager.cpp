@@ -64,12 +64,13 @@ void RecentFilesManager::load(){
 // Zapisuje ostatnie pliki
 void RecentFilesManager::save() const{
     QSettings s("UstawienieOstatniePliki","Notatnik");
-    s.beginWriteArray("recentFiles", files.size());
+    s.beginWriteArray("recentFiles", files.size()); // dodaje ostatnie pliki z przodu arraya
 
     for(int i = 0; i< files.size(); ++i){
         s.setArrayIndex(i);
         s.setValue("path", files[i].path);
         s.setValue("lastModified", files[i].lastModified);
     }
-    s.endArray();
+
+    s.endArray(); // koniec arraya
 }

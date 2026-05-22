@@ -49,14 +49,13 @@ QString FileHandling::getSaveFilePath(QWidget *parent){
     "Python (*.py *.pyw)");
 }
 
+// Metoda sprawdza czy plik został zapisany
 FileHandling::SaveResult FileHandling::checkSaveStatus(QWidget *parent, QPlainTextEdit *editor) {
     if (!editor->document()->isModified()) {
         return SaveResult::NoChanges;
     }
 
-    QMessageBox msgBox(QMessageBox::Warning, "Notatnik",
-                       "Dokument został zmodyfikowany.\nCzy chcesz zapisać zmiany?",
-                       QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, parent);
+    QMessageBox msgBox(QMessageBox::Warning, "Notatnik", "Dokument został zmodyfikowany.\nCzy chcesz zapisać zmiany?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, parent);
 
     msgBox.setButtonText(QMessageBox::Save, "Zapisz");
     msgBox.setButtonText(QMessageBox::Discard, "Nie zapisuj");

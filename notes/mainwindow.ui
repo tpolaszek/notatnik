@@ -70,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOtw_rz_plik">
@@ -152,6 +152,11 @@
    </property>
   </action>
   <action name="settings">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icons/settings.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Ustawienia</string>
    </property>

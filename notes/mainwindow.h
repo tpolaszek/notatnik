@@ -48,7 +48,7 @@ private slots:
 
 
 protected:
-    void closeEvent(QCloseEvent *event) override; // Przechwytuje zdarzenie zamknięcia
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     void applyHighlighter(const QString &filePath);
