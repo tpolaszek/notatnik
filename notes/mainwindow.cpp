@@ -38,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Przycisk pokazuje się w prawym górnym rogu menuBara
     menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
 
-    // Ustawienie szaregp tła dla przycisku, dlatego że czarne ikony zlewają się z tłem
-    viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: #858585; }" "QToolButton:hover { background: #696868; border-radius: 4px; }");
+    viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: transparent; }" "QToolButton:hover { border-radius: 4px; }");
 
     bool *isPreview = new bool(false); // przechowuje stan wyświetlania
     connect(viewMode, &QToolButton::clicked, this, [this, viewMode, isPreview]() {

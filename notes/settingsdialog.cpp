@@ -10,13 +10,15 @@ SettingsDialog::SettingsDialog(SettingsManager *manager, ViewManager *viewManage
 {
     ui->setupUi(this);
 
+    setWindowIcon(QIcon(":/icons/settings.png"));
+
     connect(ui->listWidget, &QListWidget::currentRowChanged, ui->stackedWidget, &QStackedWidget::setCurrentIndex);
 
     connect(ui->themeList, &QListWidget::itemClicked, this, &SettingsDialog::onThemeSelected);
 
     // podłączenie wszystkich przycisków do metod
     connect(ui->browseButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseClicked); // po kliknięciu przycisku "Przeglądaj" uaktywnia metode onBrowseClicked()
-    connect(ui->pushButton,   &QPushButton::clicked, this, &SettingsDialog::onApplyClicked); // po kliknięciu zastosuj uaktywnia metode onApplyClicked()
+    connect(ui->pushButton, &QPushButton::clicked, this, &SettingsDialog::onApplyClicked); // po kliknięciu zastosuj uaktywnia metode onApplyClicked()
     connect(ui->pushButton_2, &QPushButton::clicked, this, &SettingsDialog::onOkClicked);  // po kliknięciu OK ukatywnia metode onOkClicked()
 
     populateThemeList();
