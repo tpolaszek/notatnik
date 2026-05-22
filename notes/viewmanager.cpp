@@ -60,17 +60,17 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     editor->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     connect(editor, &QPlainTextEdit::cursorPositionChanged, editor, [editor]() {
-        QWidget line;
-        line.setObjectName("currentLineColor");
-        line.setStyleSheet(qApp->styleSheet());
+        QWidget line; // tworzenie obiektu linia
+        line.setObjectName("currentLineColor"); // ustawienie nazwy obiektu (głównie do cssa potrzebowałem)
+        line.setStyleSheet(qApp->styleSheet()); // stosuje styl w plikach
         line.ensurePolished();
         QColor color = line.palette().color(QPalette::Window);
 
         QTextEdit::ExtraSelection selection;
-        selection.format.setBackground(color);
-        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        selection.cursor = editor->textCursor();
-        selection.cursor.clearSelection();
+        selection.format.setBackground(color); // ustawia tło linii
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true); // ustawia formatowanie na całą linie
+        selection.cursor = editor->textCursor();  // ustanawia gdzie jest kursor tekstu
+        selection.cursor.clearSelection(); // usuwa poprzednie zaznaczenie przez ustawienie "kotwicy" na aktualnej pozycji kursora
         editor->setExtraSelections({selection});
     });
 }
