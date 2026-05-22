@@ -71,16 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWidget(ui->noteText);
 
-    // ====================================================================
-    // <<< TUTAJ JEST TA KLUCZOWA DOKŁADKA >>>
-    // Podpinamy nasz ViewManager jako filtr zdarzeń bezpośrednio pod okienko podpowiedzi!
-    // Dzięki temu każdy kliknięty TAB/Enter w dymku trafi prosto do naszego eventFilter.
     completer->popup()->installEventFilter(viewManager);
-    // ====================================================================
 
     viewManager->setCompleter(completer);
 
-    // <<< TO DOPISZ TUTAJ >>>
     connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, [this](const QString &completion) {
         // Pobieramy prefix, który użytkownik zdążył wpisać (np. "pr")
         QString prefix = completer->completionPrefix();
@@ -92,7 +86,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->noteText->insertPlainText(toInsert);
     });
 
-    // 2. ŁĄCZYMY WSZYSTKO W JEDNYM MIEJSCU (Licznik linii + Słownik)
     connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
         // Aktualizacja licznika linii
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
@@ -103,10 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    // 3. STARTOWY SŁOWNIK: Żeby działało od razu po włączeniu notatnika
     syntaxDict->updateLanguageForFile("default.cpp", completer);
-
-
 }
 
 MainWindow::~MainWindow()
@@ -115,59 +105,69 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Zmienia tytuł okna na nazwe pliku + Notatnik
 void MainWindow::setTitle(QString title){
     if(title.isEmpty()) return;
     this->setWindowTitle(title + " - Notatnik");
 }
 
+//Aplikuje podkreślenie składni
 void MainWindow::applyHighlighter(const QString& filePath)
 {
-    delete currentHighlighter;
+    delete currentHighlighter; // usuwa poprzednie zaznaczenie
     currentHighlighter = nullptr;
 
-    QFileInfo info(filePath);
-    QString ext = info.suffix().toLower();
+    QFileInfo info(filePath); // przechowuje informacje o pliku
+    QString ext = info.suffix().toLower(); // przechowuje końcówke pliku w małych literach
 
-    QJsonObject grammar = grammarLoader.grammarForExtension(ext);
+    QJsonObject grammar = grammarLoader.grammarForExtension(ext); // ładuje zasady zaznaczenia dla rozszerzenia
+
+    // Jeśli istnieje
     if(!grammar.isEmpty()){
-        currentHighlighter = new SyntaxHighlighter(ui->noteText->document());
-        currentHighlighter->loadFromJson(grammar);
+        currentHighlighter = new SyntaxHighlighter(ui->noteText->document()); // aplikuj podkreślenie dla całego dokumentu
+        currentHighlighter->loadFromJson(grammar); // ładuje zasady z pliku json w folderze /syntax
     }
 }
 
+// Otwiera plik
 void MainWindow::openFileFromPath(const QString &filePath){
-    if(filePath.isEmpty()) return;
+    if(filePath.isEmpty()) return; // jeśli nie ma tego pliku nie otwieraj go
 
-    QString content = FileHandling::openFile(filePath);
+    QString content = FileHandling::openFile(filePath); // przechowywuje zawartość pliku
     if(content.isNull()) return;
 
-    ui->noteText->setPlainText(content);
+    ui->noteText->setPlainText(content); // przekazuje tekst do dokumentu
     currentFilePath = filePath;
-    setTitle(filePath);
-    applyHighlighter(filePath);
-    recordAndRefresh(filePath);
+    setTitle(filePath); // ustawia nazwe w metodzie setTitle
+    applyHighlighter(filePath); // ustaiwa odpowiednie podkreślenie do rodzaju pliku
+    recordAndRefresh(filePath); // zapisuje plik do ostatnio otwartych
 
     if (syntaxDict && completer) {
         syntaxDict->updateLanguageForFile(filePath, completer);
     }
 }
 
+// Metoda zapisuje i odświeża ostatnio otwarte pliki
 void MainWindow::recordAndRefresh(const QString &filePath) {
     recentMgr.recordFile(filePath);
 }
 
+// Metoda zapełnia menu z ostatnimi plikami
 void MainWindow::fillRecentMenu(){
-    recentMenu->clear();
+    recentMenu->clear(); // czyści menu
 
-    const QList<RecentFile> files = recentMgr.recentFiles();
+    const QList<RecentFile> files = recentMgr.recentFiles(); // dodaje do listy ostatnie pliki
+
+    // Jeśli nie ma plików
     if(files.isEmpty()) {
-        QAction *empty = recentMenu->addAction("Brak plików");
+        QAction *empty = recentMenu->addAction("Brak plików"); // dodaje do menu informacje o braku plików
         empty->setEnabled(false);
         return;
     }
 
+    // Dla każdego ostatnio otwartego pliku
     for(const RecentFile &rf : files){
-        QFileInfo info(rf.path);
+        QFileInfo info(rf.path); // pobieramy informacje o pliku
 
         QString label = info.fileName() + "    " + rf.lastModified.toString("dd.MM.yyyy  hh:mm");
 
@@ -193,7 +193,7 @@ void MainWindow::on_openFile_triggered()
         setTitle(filePath);
         applyHighlighter(filePath);
         recordAndRefresh(filePath);
-        // POPRAWKA: Zamiast fileName przekazujemy filePath
+
         if (syntaxDict && completer) {
             syntaxDict->updateLanguageForFile(filePath, completer);
         }
@@ -202,12 +202,12 @@ void MainWindow::on_openFile_triggered()
 
 void MainWindow::on_createFile_triggered()
 {
-    delete currentHighlighter;
+    delete currentHighlighter; // usuwa aktualne zaznaczenie
     currentHighlighter = nullptr;
 
-    ui->noteText->clear();
+    ui->noteText->clear(); // czyści widok
     currentFilePath = QString();
-    this->setWindowTitle("Notatnik");
+    this->setWindowTitle("Notatnik"); // ustawia nazwe okna na "Notatnik"
 }
 
 void MainWindow::on_saveFile_triggered()
@@ -248,28 +248,28 @@ void MainWindow::on_Find_triggered()
     bool ok;
     int counter = 0;
     do {
-        int totalMatches = TextTools::getCount(ui->noteText, lastSearchTerm);
+        int totalMatches = TextTools::getCount(ui->noteText, lastSearchTerm); // pobiera ilość wszystkich wyników
         QString count = "(" + QString::number(counter) + "/" + QString::number(totalMatches) + ")";
 
-        // 1. Pokazujemy Twoje standardowe okienko
-        QString searchTerm = QInputDialog::getText(this, "Szukaj " + count, "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok);
+        QString searchTerm = QInputDialog::getText(this, "Szukaj " + count, "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok); // otwiera okno z inputem które pobiera słowo do szukania
 
-        // 2. Jeśli użytkownik kliknął OK i tekst nie jest pusty
+        // Jeśli użytkownik kliknął OK i tekst nie jest pusty
         if (ok && !searchTerm.isEmpty()) {
             counter++;
             lastSearchTerm = searchTerm;
 
-            // 3. Wywołujemy Twoje szukanie z TextTools
+            // Wywołujemy metode szukania
             TextTools::findText(this, ui->noteText, lastSearchTerm);
 
-            // Wymuszamy, aby Qt odświeżyło edytor i pokazało podświetlone słowo zanim otworzy kolejne okno
+            // Wymuszanie odświeżenia całego okna
             ui->noteText->repaint();
         }
         if(counter > totalMatches) counter = 1;
     } while (ok && ui->noteText->textCursor().hasSelection());
-    // Pętla działa tak długo, jak klikasz OK i program znajduje kolejne słowa
+    // Pętla działa tak długo, póki nie klikniesz anuluj i program znajduje kolejne słowa
 }
 
+// Metoda otwiera okno ustawień
 void MainWindow::on_settings_triggered()
 {
     SettingsDialog dlg(settingsManager, viewManager, this);
