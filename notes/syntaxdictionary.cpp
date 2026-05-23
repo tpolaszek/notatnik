@@ -4,38 +4,56 @@
 #include <QRegularExpression>
 #include <QAbstractItemView>
 #include <QKeyEvent>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 SyntaxDictionary::SyntaxDictionary(QObject *parent) : QObject(parent)
 {
     // Konstruktor może narazie pozostać pusty
 }
 
-// 1. Zwracanie słów kluczowych na podstawie rozszerzenia (.cpp, .py, .html)
 QStringList SyntaxDictionary::getKeywordsForFile(const QString &filePath)
 {
+    // Pobiera rozszerzenie pliku i zamienia na małe litery (np. "cpp", "py")
     QFileInfo fileInfo(filePath);
-    QString ext = fileInfo.suffix().toLower(); // Wyciąga samo rozszerzenie pliku
+    QString ext = fileInfo.suffix().toLower();
 
-    if (ext == "cpp" || ext == "h") {
-        return { "int", "float", "char", "double", "class", "struct", "public",
-                "private", "protected", "if", "else", "while", "for", "return",
-                "include", "switch", "case", "break", "continue", "void", "true", "false" };
-    }
-    else if (ext == "py") {
-        return { "def", "class", "import", "from", "as", "if", "else", "elif",
-                "while", "for", "in", "return", "print", "try", "except",
-                "lambda", "None", "True", "False", "pass", "break", "continue" };
-    }
-    else if (ext == "html" || ext == "htm") {
-        return { "<html>", "</html>", "<head>", "</head>", "<body>", "</body>",
-                "<div>", "</div>", "<p>", "</p>", "<span>", "</span>",
-                "<h1>", "</h1>", "<a>", "</a>", "img", "src", "href", "class", "id" };
+    // Tworzy dynamiczną ścieżkę do pliku JSON w zasobach Qt
+    QString jsonPath = ":/dictionary/dictionary/" + ext + ".json";
+    QFile file(jsonPath);
+
+    // ZABEZPIECZENIE: Jeśli nie ma takiego JSON-a, kończy bezpiecznie bez crasha
+    if (!file.open(QFile::ReadOnly)) {
+        return QStringList();
     }
 
-    // Jeśli plik to zwykły .txt lub nieznany format, nie podpowiadamy nic
-    return QStringList();
+    // Wczytuje surowe dane tekstowe i zamyka plik
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    // ZABEZPIECZENIE: Przetwarza tekst na JSON i sprawdza, czy plik nie jest uszkodzony
+    QJsonDocument doc = QJsonDocument::fromJson(fileData);
+    if (doc.isNull() || !doc.isObject()) {
+        return QStringList();
+    }
+
+    // Wyciąga główny obiekt JSON oraz tworzy listę na słowa
+    QJsonObject jsonObject = doc.object();
+    QStringList words;
+
+    // Sprawdza, czy istnieje lista o nazwie "keywords" i przepisuje ją do pamięci programu
+    if (jsonObject.contains("keywords") && jsonObject["keywords"].isArray()) {
+        QJsonArray jsonArray = jsonObject["keywords"].toArray();
+        for (int i = 0; i < jsonArray.size(); ++i) {
+            words.append(jsonArray.at(i).toString());
+        }
+    }
+
+    // Zwraca gotową listę słów kluczowych do kompletera
+    return words;
 }
-
 // 2. Ładowanie nowych słów do QCompletera
 void SyntaxDictionary::updateLanguageForFile(const QString &filePath, QCompleter *completer)
 {

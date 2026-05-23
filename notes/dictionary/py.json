@@ -1,0 +1,7 @@
+{
+  "keywords": [
+    "def", "class", "import", "from", "as", "if", "else", "elif",
+    "while", "for", "in", "return", "print", "try", "except",
+    "lambda", "None", "True", "False", "pass", "break", "continue"
+  ]
+}

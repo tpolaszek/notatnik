@@ -1,0 +1,7 @@
+{
+  "keywords": [
+    "<html>", "</html>", "<head>", "</head>", "<body>", "</body>",
+    "<div>", "</div>", "<p>", "</p>", "<span>", "</span>",
+    "<h1>", "</h1>", "<a>", "</a>", "img", "src", "href", "class", "id"
+  ]
+}

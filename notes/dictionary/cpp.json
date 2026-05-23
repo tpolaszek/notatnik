@@ -1,0 +1,7 @@
+{
+  "keywords": [
+    "int", "float", "char", "double", "class", "struct", "public",
+    "private", "protected", "if", "else", "while", "for", "return",
+    "include", "switch", "case", "break", "continue", "void", "true", "false"
+  ]
+}
