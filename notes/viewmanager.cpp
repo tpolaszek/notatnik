@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QCompleter>
 #include <QAbstractItemView>
+#include <QScrollBar>
 
 ViewManager::ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar, QObject *parent)
     : QObject(parent), m_editor(editor), m_lineCounter(lineCounter), m_statusBar(statusBar) {}
@@ -181,6 +182,30 @@ bool ViewManager::handleSmartKeys(QKeyEvent *keyEvent, QPlainTextEdit *editor) {
     }
 
     return false;
+}
+// Kontroluje zawsze były 3 linie wyświetlane na końcu
+void ViewManager::setupBottomSpace(QPlainTextEdit *editor) {
+    // 1. Bezpieczeństwo: sprawdzamy, czy edytor w ogóle istnieje
+    if (!editor) return;
+
+    // 2. Podpinamy się pod sygnał zmiany pozycji kursora
+    QObject::connect(editor, &QPlainTextEdit::cursorPositionChanged, editor, [editor]() {
+
+        // 3. Pobieramy pionowy suwak (scrollbary) edytora
+        QScrollBar *vBar = editor->verticalScrollBar();
+        if (!vBar) return;
+
+        // 4. Pobieramy numer bieżącej linii kursora oraz łączną liczbę linii
+        int currentLine = editor->textCursor().blockNumber();
+        int totalLines = editor->document()->blockCount();
+
+        // 5. Jeśli kursor jest na jednej z 3 ostatnich linii (strefa przykońcowa)...
+        if (totalLines - currentLine <= 3) {
+            // ...bezwzględnie dopychamy suwak do samego dołu,
+            // dzięki czemu nawias } zawsze wyskoczy na ekran!
+            vBar->setValue(vBar->maximum());
+        }
+    });
 }
 
 void ViewManager::switchToEdit() { applyStyles(true); }

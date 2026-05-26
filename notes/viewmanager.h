@@ -18,6 +18,7 @@ public:
     void switchToPreview();
     void setupEditorVisuals(QPlainTextEdit *editor);
     void setCompleter(QCompleter *c) { m_completer = c; } // Szybki setter
+    static void setupBottomSpace(QPlainTextEdit *editor);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

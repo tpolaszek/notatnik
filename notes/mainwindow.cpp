@@ -20,6 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowTitle("Notatnik");
 
+    // Konfiguruje automatyczny margines przewijania na dole edytora
+    ViewManager::setupBottomSpace(ui->noteText);
+
     TextTools::setupLineCounterUI(ui->noteText, ui->lineCounter);
     connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
         TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
