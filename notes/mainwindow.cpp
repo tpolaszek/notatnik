@@ -19,16 +19,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setWindowTitle("Notatnik");
-
-    // Konfiguruje automatyczny margines przewijania na dole edytora
-    ViewManager::setupBottomSpace(ui->noteText);
-
-    TextTools::setupLineCounterUI(ui->noteText, ui->lineCounter);
-    connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
-        TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
-    });
-    // Tą ikonę trzeba zmienić na coś lepszego
     setWindowIcon(QIcon(":/icons/note_icon.png"));
+
+    viewManager = nullptr; // dopiero inicjowanie zajdzie w innej metodzie ponieważ wymagane będzie aktualizowanie na bierząco
+
+    tabWidget = ui->tabWidget;
+    tabWidget->setTabsClosable(true);
+    tabWidget->setMovable(true);
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabClose);
+    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChange);
 
     auto *viewMode = new QToolButton(this);
     viewMode->setIcon(QIcon(":/icons/preview.png"));
@@ -40,13 +39,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Przycisk pokazuje się w prawym górnym rogu menuBara
     menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
-
     viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: transparent; }" "QToolButton:hover { border-radius: 4px; }");
 
     bool *isPreview = new bool(false); // przechowuje stan wyświetlania
-    connect(viewMode, &QToolButton::clicked, this, [this, viewMode, isPreview]() {
-        *isPreview = !*isPreview;
-        if (*isPreview) {
+    connect(viewMode, &QToolButton::clicked, this, [this, viewMode]() {
+        EditorTab *tab = currentTab();
+        if (!tab) return;
+        tab->isPreview = !tab->isPreview;
+        if (tab->isPreview) {
             viewManager->switchToPreview();
             viewMode->setIcon(QIcon(":/icons/edit.png"));
         } else {
@@ -63,71 +63,177 @@ MainWindow::MainWindow(QWidget *parent)
     recentMenu = ui->menuOstatnioOtwarte;
     connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
 
-
-    viewManager = new ViewManager(ui->noteText, ui->lineCounter, this->statusBar());
-    viewManager->setupEditorVisuals(ui->noteText);
-
     // 1. Tworzymy obiekt słownika i kompletera
     syntaxDict = new SyntaxDictionary(this);
     completer = new QCompleter(this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setWidget(ui->noteText);
 
-    completer->popup()->installEventFilter(viewManager);
-
-    viewManager->setCompleter(completer);
-
-    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, [this](const QString &completion) {
-        // Pobieramy prefix, który użytkownik zdążył wpisać (np. "pr")
-        QString prefix = completer->completionPrefix();
-
-        // Obliczamy ile liter brakuje (np. dla "print" i "pr" -> brakuje "int")
-        QString toInsert = completion.mid(prefix.length());
-
-        // Wklejamy brakujący tekst do edytora
-        ui->noteText->insertPlainText(toInsert);
-    });
-
-    connect(ui->noteText, &QPlainTextEdit::textChanged, this, [this]() {
-        // Aktualizacja licznika linii
-        TextTools::updateLineCounter(ui->noteText, ui->lineCounter);
-
-        // Wywołanie słownika
-        if (syntaxDict && completer) {
-            syntaxDict->handleTextChange(ui->noteText, completer);
-        }
-    });
 
     syntaxDict->updateLanguageForFile("default.cpp", completer);
+
+    addTab(); // otworzenie pustej strony
 }
 
 MainWindow::~MainWindow()
 {
+    for(EditorTab &tab : tabs) {
+        delete tab.highlighter;
+        tab.highlighter = nullptr;
+    }
+
     delete currentHighlighter;
     delete ui;
 }
 
+int MainWindow::currentTabIndex() const{
+    return tabWidget->currentIndex();
+}
+
+EditorTab *MainWindow::currentTab(){
+    int ind = currentTabIndex();
+    if(ind < 0 || ind >= tabs.size()) return nullptr;
+    return &tabs[ind];
+}
+
+int MainWindow::addTab(const QString &filePath){
+    // budowanie edytora do każdej karty moim zdaniem lepsze rozwiązanie niż tworzenie .ui
+    auto *container = new QWidget(); // tworzenie nowego obiektu QWidget
+    auto *hLayout = new QHBoxLayout(); // tworzenie nowego QHBoxLayout
+
+    auto *lineCounter = new QPlainTextEdit(container);
+    lineCounter->setReadOnly(true);
+    lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    lineCounter->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    lineCounter->setObjectName("lineCounter");
+
+    auto *editor = new QPlainTextEdit(container);
+    editor->setObjectName("noteText");
+
+    hLayout->addWidget(lineCounter);
+    hLayout->addWidget(editor);
+
+    EditorTab tab;
+    tab.editor = editor;
+    tab.lineCounter = lineCounter;
+    tab.filePath = filePath;
+
+    QString label = filePath.isEmpty() ? "Nowy plik" : QFileInfo(filePath).fileName();
+
+    int ind = tabWidget->addTab(container, label);
+    tabs.insert(ind, tab);
+
+    TextTools::setupLineCounterUI(editor, lineCounter);
+    ViewManager::setupBottomSpace(editor);
+
+    connectEditorSignals(ind);
+    tabWidget->setCurrentIndex(ind);
+
+    return ind;
+}
+void MainWindow::connectEditorSignals(int tabIndex){
+    if(tabIndex < 0 || tabIndex >= tabs.size()) return;
+    EditorTab &tab = tabs[tabIndex];
+
+    //Aktualizowanie licznika wierszy
+    connect(tab.editor, &QPlainTextEdit::textChanged, this, [this, tabIndex](){
+        if(tabIndex>= tabs.size()) return;
+        EditorTab &t = tabs[tabIndex];
+        TextTools::updateLineCounter(t.editor, t.lineCounter);
+
+        // Autozupełnianie
+        if(syntaxDict && completer) syntaxDict->handleTextChange(t.editor, completer);
+    });
+
+    connect(tab.editor->document(), &QTextDocument::modificationChanged, this, [this, tabIndex](bool modified){
+        if(tabIndex >= tabs.size()) return;
+        updateTabTitle(tabIndex);
+
+        if(tabIndex == currentTabIndex()){
+            const EditorTab &t = tabs[tabIndex];
+            QString base = t.filePath.isEmpty() ? "Nowy plik" : QFileInfo(t.filePath).fileName();
+            setTitle((modified ? "* " : " ") + base);
+        }
+    });
+}
+
+bool MainWindow::closeTab(int index){
+    if (index < 0 || index >= tabs.size()) return false;
+
+    if (!proceedWithSafetyCheck(index)) return false;
+
+    delete tabs[index].highlighter;
+    tabs[index].highlighter = nullptr;
+
+    tabs.removeAt(index);
+    tabWidget->removeTab(index);
+
+    if(tabs.isEmpty()) addTab();
+
+    return true;
+}
+
+void MainWindow::updateTabTitle(int tabIndex){
+    if(tabIndex < 0 || tabIndex >= tabs.size()) return;
+    const EditorTab &tab = tabs[tabIndex];
+
+    QString name = tab.filePath.isEmpty() ? "Nowy plik" : QFileInfo(tab.filePath).fileName();
+
+    if(tab.editor->document()->isModified()) name.prepend("* "); // jeśli plik nie jest zapisany to dodaje gwiazdke przed nazwą
+
+    tabWidget->setTabText(tabIndex, name);
+    tabWidget->setTabToolTip(tabIndex, tab.filePath);
+}
+
+void MainWindow::onTabClose(int index){
+    closeTab(index);
+}
+
+void MainWindow::onTabChange(int index){
+    if(index < 0 || index >= tabs.size()) return;
+    EditorTab &tab = tabs[index];
+
+    delete viewManager;
+    viewManager = new ViewManager(tab.editor, tab.lineCounter, this->statusBar());
+    viewManager->setupEditorVisuals(tab.editor);
+    completer->setWidget(tab.editor);
+    completer->popup()->installEventFilter(viewManager);
+    viewManager->setCompleter(completer);
+
+    QString base = tab.filePath.isEmpty() ? "Nowy plik" : QFileInfo(tab.filePath).fileName();
+
+    bool mod = tab.editor->document()->isModified();
+    setTitle((mod ? "* " : "") + base);
+
+    viewManager->applyFontSize(settingsManager->fontSize());
+}
+
 // Zmienia tytuł okna na nazwe pliku + Notatnik
 void MainWindow::setTitle(QString title){
-    if(title.isEmpty()) return;
+    if(title.isEmpty()){
+        setWindowTitle("Notatnik");
+        return;
+    };
     this->setWindowTitle(title + " - Notatnik");
 }
 
 //Aplikuje podkreślenie składni
-void MainWindow::applyHighlighter(const QString& filePath)
+void MainWindow::applyHighlighter(int tabIndex, const QString& filePath)
 {
-    delete currentHighlighter; // usuwa poprzednie zaznaczenie
-    currentHighlighter = nullptr;
+    if(tabIndex < 0 || tabIndex>=tabs.size()) return;
+    EditorTab &tab = tabs[tabIndex];
 
-    QFileInfo info(filePath); // przechowuje informacje o pliku
-    QString ext = info.suffix().toLower(); // przechowuje końcówke pliku w małych literach
+    delete tab.highlighter;
+    tab.highlighter = nullptr;
 
-    QJsonObject grammar = grammarLoader.grammarForExtension(ext); // ładuje zasady zaznaczenia dla rozszerzenia
+    if (filePath.isEmpty()) return;
 
-    // Jeśli istnieje
-    if(!grammar.isEmpty()){
-        currentHighlighter = new SyntaxHighlighter(ui->noteText->document()); // aplikuj podkreślenie dla całego dokumentu
-        currentHighlighter->loadFromJson(grammar); // ładuje zasady z pliku json w folderze /syntax
+    QFileInfo info(filePath);
+    QString ext = info.suffix().toLower();
+    QJsonObject grammar = grammarLoader.grammarForExtension(ext);
+
+    if(!grammar.isEmpty()) {
+        tab.highlighter = new SyntaxHighlighter(tab.editor->document());
+        tab.highlighter->loadFromJson(grammar);
     }
 }
 
@@ -135,13 +241,32 @@ void MainWindow::applyHighlighter(const QString& filePath)
 void MainWindow::openFileFromPath(const QString &filePath){
     if(filePath.isEmpty()) return; // jeśli nie ma tego pliku nie otwieraj go
 
+    for(int i = 0; i<tabs.size(); ++i){
+        if(tabs[i].filePath == filePath){
+            tabWidget->setCurrentIndex(i);
+            return;
+        }
+    }
+
+    int targetIndex = currentTabIndex();
+    EditorTab *cur = currentTab();
+    bool reuseCurrentTab = cur && cur->filePath.isEmpty() && !cur->editor->document()->isModified();
+
+    if(!reuseCurrentTab){
+        targetIndex = addTab();
+    }
+
     QString content = FileHandling::openFile(filePath); // przechowywuje zawartość pliku
     if(content.isNull()) return;
 
-    ui->noteText->setPlainText(content); // przekazuje tekst do dokumentu
-    currentFilePath = filePath;
+    EditorTab &tab = tabs[targetIndex];
+    tab.filePath = filePath;
+    tab.editor->setPlainText(content); // przekazuje tekst do dokumentu
+    tab.editor->document()->setModified(false); // domyślnie ustawia plik na nieedytowany
+
+    updateTabTitle(targetIndex); // Ustawia tytuł karty
     setTitle(filePath); // ustawia nazwe w metodzie setTitle
-    applyHighlighter(filePath); // ustaiwa odpowiednie podkreślenie do rodzaju pliku
+    applyHighlighter(targetIndex, filePath); // ustaiwa odpowiednie podkreślenie do rodzaju pliku
     recordAndRefresh(filePath); // zapisuje plik do ostatnio otwartych
 
     if (syntaxDict && completer) {
@@ -183,74 +308,65 @@ void MainWindow::fillRecentMenu(){
     }
 }
 
-void MainWindow::on_openFile_triggered()
-{
+void MainWindow::on_openFile_triggered() {
     QString filePath = FileHandling::getOpenFilePath(this);
     if(filePath.isEmpty()) return;
-
-    QString content = FileHandling::openFile(filePath);
-    if(!content.isNull()){
-        ui->noteText->setPlainText(content);
-        currentFilePath = filePath;
-        setTitle(filePath);
-        applyHighlighter(filePath);
-        recordAndRefresh(filePath);
-
-        if (syntaxDict && completer) {
-            syntaxDict->updateLanguageForFile(filePath, completer);
-        }
-    }
+    openFileFromPath(filePath);
 }
 
-void MainWindow::on_createFile_triggered()
-{
-    delete currentHighlighter; // usuwa aktualne zaznaczenie
-    currentHighlighter = nullptr;
+void MainWindow::on_createFile_triggered() {
+    EditorTab *tab = currentTab();
+    if(!tab) return;
 
-    ui->noteText->clear(); // czyści widok
+    tab->editor->clear(); // czyści widok
     currentFilePath = QString();
     this->setWindowTitle("Notatnik"); // ustawia nazwe okna na "Notatnik"
 }
 
-void MainWindow::on_saveFile_triggered()
-{
-    if (currentFilePath.isEmpty()) {
+void MainWindow::on_saveFile_triggered() {
+    EditorTab *tab = currentTab();
+    if(!tab) return;
+
+    if (tab->filePath.isEmpty()) {
         on_saveFileAs_triggered();
     } else {
-        if (FileHandling::saveFile(currentFilePath, ui->noteText->toPlainText())) {
-            // Resetujemy flagę - to mówi programowi, że zmiany zostały zapisane
-            ui->noteText->document()->setModified(false);
+        if (FileHandling::saveFile(tab->filePath, tab->editor->toPlainText())) {
+            tab->editor->document()->setModified(false);
+            updateTabTitle(currentTabIndex());
         }
     }
 }
 
-void MainWindow::on_saveFileAs_triggered()
-{
+void MainWindow::on_saveFileAs_triggered() {
+    EditorTab *tab = currentTab();
+    if(!tab) return;
+
     QString fileName = FileHandling::getSaveFilePath(this);
     if (fileName.isEmpty()) return;
-    currentFilePath = fileName;
+    tab->filePath = fileName;
 
-    if (FileHandling::saveFile(fileName, ui->noteText->toPlainText())) {
-        setTitle(currentFilePath);
-        applyHighlighter(currentFilePath);
-        recordAndRefresh(currentFilePath);
+    if (FileHandling::saveFile(fileName, tab->editor->toPlainText())) {
+        tab->editor->document()->setModified(false);
+        updateTabTitle(currentTabIndex());
+        setTitle(QFileInfo(fileName).fileName());
+        applyHighlighter(currentTabIndex(), fileName);
+        recordAndRefresh(fileName);
 
         if (syntaxDict && completer) {
             syntaxDict->updateLanguageForFile(currentFilePath, completer);
         }
-        // Resetujemy flagę po zapisaniu nowego pliku
-        ui->noteText->document()->setModified(false);
     }
 }
 
 
-void MainWindow::on_Find_triggered()
-{
+void MainWindow::on_Find_triggered() {
+    EditorTab *tab = currentTab();
+    if (!tab) return;
 
     bool ok;
     int counter = 0;
     do {
-        int totalMatches = TextTools::getCount(ui->noteText, lastSearchTerm); // pobiera ilość wszystkich wyników
+        int totalMatches = TextTools::getCount(tab->editor, lastSearchTerm); // pobiera ilość wszystkich wyników
         QString count = "(" + QString::number(counter) + "/" + QString::number(totalMatches) + ")";
 
         QString searchTerm = QInputDialog::getText(this, "Szukaj " + count, "Znajdź:", QLineEdit::Normal, lastSearchTerm, &ok); // otwiera okno z inputem które pobiera słowo do szukania
@@ -261,54 +377,56 @@ void MainWindow::on_Find_triggered()
             lastSearchTerm = searchTerm;
 
             // Wywołujemy metode szukania
-            TextTools::findText(this, ui->noteText, lastSearchTerm);
+            TextTools::findText(this, tab->editor, lastSearchTerm);
 
             // Wymuszanie odświeżenia całego okna
-            ui->noteText->repaint();
+            tab->editor->repaint();
         }
         if(counter > totalMatches) counter = 1;
-    } while (ok && ui->noteText->textCursor().hasSelection());
+    } while (ok && tab->editor->textCursor().hasSelection());
     // Pętla działa tak długo, póki nie klikniesz anuluj i program znajduje kolejne słowa
 }
 
 // Metoda otwiera okno ustawień
-void MainWindow::on_settings_triggered()
-{
+void MainWindow::on_settings_triggered() {
     SettingsDialog dlg(settingsManager, viewManager, this);
     dlg.exec();
 }
 
-void MainWindow::on_FindAndReplace_triggered()
-{
-    TextTools::findAndReplace(this, ui->noteText);
+void MainWindow::on_FindAndReplace_triggered() {
+    EditorTab *tab = currentTab();
+    if (!tab) return;
+
+    TextTools::findAndReplace(this, tab->editor);
 }
 
 void MainWindow::on_closeFile_triggered()
 {
-    delete currentHighlighter;
-    currentHighlighter = nullptr;
-
-    ui->noteText->clear();
-    currentFilePath = QString();
-    this->setWindowTitle("Notatnik");
+    closeTab(currentTabIndex());
 }
 void MainWindow::closeEvent(QCloseEvent *event) {
-    // Wywołujemy Twoją funkcję sprawdzającą
-    if (proceedWithSafetyCheck()) {
-        event->accept(); // Pozwól na zamknięcie okna
-    } else {
-        event->ignore(); // Zatrzymaj zamykanie okna (użytkownik kliknął Cancel)
+    for (int i = tabs.size() - 1; i >= 0; --i) {
+        tabWidget->setCurrentIndex(i);
+        if (!proceedWithSafetyCheck(i)) {
+            event->ignore();
+            return;
+        }
     }
+    event->accept();
 }
-bool MainWindow::proceedWithSafetyCheck() {
+bool MainWindow::proceedWithSafetyCheck(int tabIndex) {
+    if(tabIndex< 0 || tabIndex >= tabs.size()) return true;
+    EditorTab &tab = tabs[tabIndex];
+
     // 1. Pytamy "robota od plików", co sądzi o sytuacji
-    FileHandling::SaveResult result = FileHandling::checkSaveStatus(this, ui->noteText);
+    FileHandling::SaveResult result = FileHandling::checkSaveStatus(this, tab.editor);
 
     // 2. Jeśli użytkownik chce zapisać, odpalamy Twoją gotową funkcję
     if (result == FileHandling::SaveResult::SaveRequested) {
+        tabWidget->setCurrentIndex(tabIndex);
         on_saveFile_triggered();
         // Jeśli po zapisie nadal jest "modified" (bo np. zamknął okno Save As), przerywamy
-        return !ui->noteText->document()->isModified();
+        return !tab.editor->document()->isModified();
     }
 
     // 3. Jeśli Cancel - zwracamy false (nie idź dalej). Jeśli Discard - true (idź dalej).
