@@ -23,6 +23,8 @@ private:
     SettingsManager *manager;
     ViewManager *viewManager;
 
+    QString chosenThemePath;
+
     void populateThemeList();
     void selectCurrentTheme();
 

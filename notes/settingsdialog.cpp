@@ -9,8 +9,10 @@ SettingsDialog::SettingsDialog(SettingsManager *manager, ViewManager *viewManage
     : QDialog(parent), ui(new Ui::SettingsWindow), manager(manager), viewManager(viewManager)
 {
     ui->setupUi(this);
-
     setWindowIcon(QIcon(":/icons/settings.png"));
+
+    chosenThemePath = manager->currentThemePath();
+    ui->fontSizeBox->setValue(manager->fontSize());
 
     connect(ui->listWidget, &QListWidget::currentRowChanged, ui->stackedWidget, &QStackedWidget::setCurrentIndex);
 
@@ -55,8 +57,7 @@ void SettingsDialog::selectCurrentTheme() {
 // Po wybraniu motywu aplikuje go
 void SettingsDialog::onThemeSelected(QListWidgetItem *item) {
     if (!item) return; // jeśli nie ma żadnych "przedmiotów" czyli elementów ListWidgeta nic nie pokazuje
-    QString path = item->data(Qt::UserRole).toString();
-    manager->setThemePath(path); // ustawia motyw na wybrany przez użytkownika motyw logika -> settingsmanager.cpp na linii 26
+    chosenThemePath = item->data(Qt::UserRole).toString();
 }
 
 // Po kliknięciu "Przeglądaj" otwiera okno dialogowe w którym wybiera się niestandardowy motyw do aplikacji
@@ -81,10 +82,28 @@ void SettingsDialog::onBrowseClicked() {
 
 // Po kliknięciu zastosuj aplikuje zmienione ustawienia
 void SettingsDialog::onApplyClicked() {
+    manager->setThemePath(chosenThemePath);
     manager->setFontSize(ui->fontSizeBox->value()); // zmienia czcionke na podaną w fontSizeBox
-    manager->save(); // zapisuje ustawienia
-    manager->applyToApp(); // Aplikuje zmienione ustawienia
-    viewManager->applyFontSize(manager->fontSize());
+    manager->save(); // zapisujemy ustawienia
+
+    manager->applyToApp(); // aplikowanie zmian do aplikacji
+
+    int newSize = manager->fontSize(); // nowy rozmiar czcionki w ustawieniach
+
+    // Sprawdzanie wszystkich otwartych widgetów w programie (w tym MainWindow)
+    for (QWidget *topLevelWidget : qApp->topLevelWidgets()) {
+        // Znajduje każdy QPlainTextEdit (czyli edytory "noteText" oraz liczniki "lineCounter")
+        QList<QPlainTextEdit*> allEditors = topLevelWidget->findChildren<QPlainTextEdit*>();
+
+        for (QPlainTextEdit *editor : allEditors) {
+            // Sprawdzamy nazwy obiektów nadane podczas tworzenia kart
+            if (editor->objectName() == "noteText" || editor->objectName() == "lineCounter") {
+                QFont font = editor->font();
+                font.setPointSize(newSize);
+                editor->setFont(font);
+            }
+        }
+    }
 }
 
 // Po kliknięciu OK zamyka okno bez zapisywania zmian

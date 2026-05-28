@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(viewMode, &QToolButton::clicked, this, [this, viewMode]() {
         EditorTab *tab = currentTab();
         if (!tab) return;
+
         tab->isPreview = !tab->isPreview;
         if (tab->isPreview) {
             viewManager->switchToPreview();
@@ -98,7 +99,10 @@ EditorTab *MainWindow::currentTab(){
 int MainWindow::addTab(const QString &filePath){
     // budowanie edytora do każdej karty moim zdaniem lepsze rozwiązanie niż tworzenie .ui
     auto *container = new QWidget(); // tworzenie nowego obiektu QWidget
-    auto *hLayout = new QHBoxLayout(); // tworzenie nowego QHBoxLayout
+
+    auto *hLayout = new QHBoxLayout(container); // tworzenie nowego QHBoxLayout
+    hLayout->setSpacing(0);
+    hLayout->setContentsMargins(0, 0, 0, 0);
 
     auto *lineCounter = new QPlainTextEdit(container);
     lineCounter->setReadOnly(true);
@@ -109,8 +113,8 @@ int MainWindow::addTab(const QString &filePath){
     auto *editor = new QPlainTextEdit(container);
     editor->setObjectName("noteText");
 
-    hLayout->addWidget(lineCounter);
-    hLayout->addWidget(editor);
+    hLayout->addWidget(lineCounter, 0);
+    hLayout->addWidget(editor, 1);
 
     EditorTab tab;
     tab.editor = editor;
@@ -353,7 +357,7 @@ void MainWindow::on_saveFileAs_triggered() {
         recordAndRefresh(fileName);
 
         if (syntaxDict && completer) {
-            syntaxDict->updateLanguageForFile(currentFilePath, completer);
+            syntaxDict->updateLanguageForFile(fileName, completer);
         }
     }
 }

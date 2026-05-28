@@ -77,7 +77,11 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
 }
 
 bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
+    if(!obj || !event) return false;
     if (event->type() != QEvent::KeyPress) return QObject::eventFilter(obj, event);
+    if (event->type() == QEvent::StyleChange || event->type() == QEvent::PaletteChange) {
+        return QObject::eventFilter(obj, event);
+    }
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
