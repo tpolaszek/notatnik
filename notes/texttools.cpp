@@ -1,4 +1,4 @@
-#include "texttools.h"
+    #include "texttools.h"
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QInputDialog>
@@ -6,7 +6,9 @@
 void TextTools::setupLineCounterUI(QPlainTextEdit *editor, QPlainTextEdit *lineCounter) {
     lineCounter->setReadOnly(true); // tryb tylko do odczytu
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Ukryj suwak
+    lineCounter->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     lineCounter->setAttribute(Qt::WA_TransparentForMouseEvents, true); //wyłącza wszystki interakcje myszką na liczniku wierszy
+    lineCounter->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     // Ustawiamy wyrównanie na poziomie DOKUMENTU
     QTextOption option = lineCounter->document()->defaultTextOption();
@@ -29,9 +31,9 @@ void TextTools::updateLineCounter(QPlainTextEdit *editor, QPlainTextEdit *lineCo
     lineCounter->setPlainText(lineNumbers);
     lineCounter->verticalScrollBar()->setValue(editor->verticalScrollBar()->value());
 }
-void TextTools::applyDynamicWidth(int totalLines, QPlainTextEdit *lineCounter) {
+void TextTools::applyDynamicWidth(int totalLines, QPlainTextEdit *lineCounter, const QFont *font) {
     // 1. Pobieramy informacje o czcionce, która jest aktualnie w liczniku
-    QFontMetrics metrics(lineCounter->font());
+    QFontMetrics metrics(font ? *font : lineCounter->font());
 
     // 2. Tworzymy wzorcowy ciąg znaków (najdłuższy możliwy numer linii)
     QString longestLine = QString::number(totalLines);

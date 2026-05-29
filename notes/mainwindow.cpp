@@ -24,11 +24,12 @@ MainWindow::MainWindow(QWidget *parent)
     viewManager = nullptr; // dopiero inicjowanie zajdzie w innej metodzie ponieważ wymagane będzie aktualizowanie na bierząco
 
     tabWidget = ui->tabWidget;
-    tabWidget->setTabsClosable(true);
-    tabWidget->setMovable(true);
+    tabWidget->setTabsClosable(true); // ustawia możliwość zamknięcia karty na true
+    tabWidget->setMovable(true); // pozwala ruszać kartami
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabClose);
     connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChange);
 
+    //VIEWMODE DO POPRAWKI CRASHUJE PO ZMIENIENIU TRYBU
     auto *viewMode = new QToolButton(this);
     viewMode->setIcon(QIcon(":/icons/preview.png"));
     viewMode->setToolTip("Podgląd / Edycja");
@@ -56,15 +57,15 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    grammarLoader.loadFromDirectory(":/syntax/syntax");
+    grammarLoader.loadFromDirectory(":/syntax/syntax"); // ładuje zasady z folderu syntax
 
     settingsManager = new SettingsManager(this);
-    settingsManager->applyToApp();
+    settingsManager->applyToApp(); // aplikowanie zapisanych ustawień
 
     recentMenu = ui->menuOstatnioOtwarte;
-    connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu);
+    connect(recentMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentMenu); // przed wyświetleniem menu wypełnia je
 
-    // 1. Tworzymy obiekt słownika i kompletera
+    // Inicjuje słownik i autouzupełnienie
     syntaxDict = new SyntaxDictionary(this);
     completer = new QCompleter(this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -86,6 +87,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Metoda zwraca index karty która jest wybrana
 int MainWindow::currentTabIndex() const{
     return tabWidget->currentIndex();
 }
@@ -109,11 +111,12 @@ int MainWindow::addTab(const QString &filePath){
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     lineCounter->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     lineCounter->setObjectName("lineCounter");
+    lineCounter->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
     auto *editor = new QPlainTextEdit(container);
     editor->setObjectName("noteText");
 
-    hLayout->addWidget(lineCounter, 0);
+    hLayout->addWidget(lineCounter);
     hLayout->addWidget(editor, 1);
 
     EditorTab tab;
@@ -144,7 +147,7 @@ void MainWindow::connectEditorSignals(int tabIndex){
         EditorTab &t = tabs[tabIndex];
         TextTools::updateLineCounter(t.editor, t.lineCounter);
 
-        // Autozupełnianie
+        // Autouzupełnianie
         if(syntaxDict && completer) syntaxDict->handleTextChange(t.editor, completer);
     });
 
@@ -165,13 +168,13 @@ bool MainWindow::closeTab(int index){
 
     if (!proceedWithSafetyCheck(index)) return false;
 
-    delete tabs[index].highlighter;
-    tabs[index].highlighter = nullptr;
+    delete tabs[index].highlighter; // usuwa podkreslenie do odpowiedniej karty
+    tabs[index].highlighter = nullptr; // czyszczenie
 
-    tabs.removeAt(index);
-    tabWidget->removeTab(index);
+    tabs.removeAt(index); // usuwa z listy odpowiednią karte
+    tabWidget->removeTab(index); // usuwa karte
 
-    if(tabs.isEmpty()) addTab();
+    if(tabs.isEmpty()) addTab(); // jeśli nie ma żadnych kart tworzy nową pustą
 
     return true;
 }
@@ -206,7 +209,7 @@ void MainWindow::onTabChange(int index){
     QString base = tab.filePath.isEmpty() ? "Nowy plik" : QFileInfo(tab.filePath).fileName();
 
     bool mod = tab.editor->document()->isModified();
-    setTitle((mod ? "* " : "") + base);
+    setTitle((mod ? "* " : "") + base); // jeśli plik nie jest zapisany to dodaje gwiazdke przed nazwą
 
     viewManager->applyFontSize(settingsManager->fontSize());
 }

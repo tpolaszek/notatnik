@@ -4,6 +4,7 @@
 #include <QCompleter>
 #include <QAbstractItemView>
 #include <QScrollBar>
+#include <QLayout>
 
 ViewManager::ViewManager(QPlainTextEdit *editor, QPlainTextEdit *lineCounter, QStatusBar *statusBar, QObject *parent)
     : QObject(parent), m_editor(editor), m_lineCounter(lineCounter), m_statusBar(statusBar) {}
@@ -25,8 +26,8 @@ void ViewManager::applyStyles(bool isEditing) {
 }
 
 void ViewManager::applyFontSize(int pointSize){
-    QFont font = m_editor->font();
-
+    QFont font("Consolas");
+    font.setStyleHint(QFont::Monospace);
     font.setPointSize(pointSize);
 
     m_editor->setFont(font); // ustawia wielkość czcionki do edytora
@@ -36,7 +37,10 @@ void ViewManager::applyFontSize(int pointSize){
     m_editor->setTabStopDistance(m_tabSize * metrics.horizontalAdvance(' ')); // ustawia odległość tabulatora
 
     int totalLines = m_editor->document()->blockCount();
-    TextTools::applyDynamicWidth(totalLines, m_lineCounter);
+    TextTools::applyDynamicWidth(totalLines, m_lineCounter, &font);
+
+    m_lineCounter->updateGeometry();
+    m_lineCounter->parentWidget()->layout()->activate();
 }
 
 // INSTRUKCJA: Tu ustawiamy "wygląd i zasady" (uruchamia się TYLKO RAZ przy starcie)
@@ -51,7 +55,7 @@ void ViewManager::setupEditorVisuals(QPlainTextEdit *editor) {
     m_lineCounter->setFont(font);
 
     // Przeliczenie szerokości Tab na dokładnie 4 spacje (w pikselach)
-    QFontMetrics metrics(font);
+    QFontMetrics metrics(editor->font());
     editor->setTabStopDistance(m_tabSize * metrics.horizontalAdvance(' '));
 
     // Przekazanie obsługi zdarzeń klawiatury do tej klasy

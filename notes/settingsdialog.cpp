@@ -4,6 +4,7 @@
 #include <QStackedWidget>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QTimer>
 
 SettingsDialog::SettingsDialog(SettingsManager *manager, ViewManager *viewManager, QWidget *parent)
     : QDialog(parent), ui(new Ui::SettingsWindow), manager(manager), viewManager(viewManager)
@@ -83,29 +84,33 @@ void SettingsDialog::onBrowseClicked() {
 // Po kliknięciu zastosuj aplikuje zmienione ustawienia
 void SettingsDialog::onApplyClicked() {
     manager->setThemePath(chosenThemePath);
-    manager->setFontSize(ui->fontSizeBox->value()); // zmienia czcionke na podaną w fontSizeBox
-    manager->save(); // zapisujemy ustawienia
+    manager->setFontSize(ui->fontSizeBox->value());
+    manager->save();
+    manager->applyToApp(); // Aplikuje ustawienia
 
-    manager->applyToApp(); // aplikowanie zmian do aplikacji
+    int newSize = manager->fontSize();
 
-    int newSize = manager->fontSize(); // nowy rozmiar czcionki w ustawieniach
+    // Zmienia czcionke globalnie do wszystkich kart
+    QFont font("Consolas");
+    font.setStyleHint(QFont::Monospace);
+    font.setPointSize(newSize);
 
-    // Sprawdzanie wszystkich otwartych widgetów w programie (w tym MainWindow)
-    for (QWidget *topLevelWidget : qApp->topLevelWidgets()) {
-        // Znajduje każdy QPlainTextEdit (czyli edytory "noteText" oraz liczniki "lineCounter")
-        QList<QPlainTextEdit*> allEditors = topLevelWidget->findChildren<QPlainTextEdit*>();
-
-        for (QPlainTextEdit *editor : allEditors) {
-            // Sprawdzamy nazwy obiektów nadane podczas tworzenia kart
-            if (editor->objectName() == "noteText" || editor->objectName() == "lineCounter") {
-                QFont font = editor->font();
-                font.setPointSize(newSize);
-                editor->setFont(font);
+    for (QWidget *w : qApp->topLevelWidgets()) {
+        for (QPlainTextEdit *e : w->findChildren<QPlainTextEdit*>()) {
+            if (e->objectName() == "noteText" || e->objectName() == "lineCounter") {
+                e->setFont(font);
             }
         }
     }
-}
 
+    // przetwarzanie zmieniania czcionki
+    qApp->processEvents();
+
+    // wymusza ustawienie rozmiaru czcionki i szerokośći licznika
+    if (viewManager) {
+        viewManager->applyFontSize(newSize);
+    }
+}
 // Po kliknięciu OK zamyka okno bez zapisywania zmian
 void SettingsDialog::onOkClicked() {
     accept();
