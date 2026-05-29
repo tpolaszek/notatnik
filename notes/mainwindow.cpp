@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabClose);
     connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChange);
 
-    //VIEWMODE DO POPRAWKI CRASHUJE PO ZMIENIENIU TRYBU
     auto *viewMode = new QToolButton(this);
     viewMode->setIcon(QIcon(":/icons/preview.png"));
     viewMode->setToolTip("Podgląd / Edycja");
@@ -42,12 +41,19 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
     viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: transparent; }" "QToolButton:hover { border-radius: 4px; }");
 
-    bool *isPreview = new bool(false); // przechowuje stan wyświetlania
     connect(viewMode, &QToolButton::clicked, this, [this, viewMode]() {
         EditorTab *tab = currentTab();
-        if (!tab) return;
+        if (!tab || !tab->editor || !tab->lineCounter) return;
 
         tab->isPreview = !tab->isPreview;
+
+        if (!viewManager) {
+            viewManager = new ViewManager(tab->editor, tab->lineCounter, this->statusBar(), this);
+        } else {
+            delete viewManager;
+            viewManager = new ViewManager(tab->editor, tab->lineCounter, this->statusBar(), this);
+        }
+
         if (tab->isPreview) {
             viewManager->switchToPreview();
             viewMode->setIcon(QIcon(":/icons/edit.png"));
@@ -322,12 +328,7 @@ void MainWindow::on_openFile_triggered() {
 }
 
 void MainWindow::on_createFile_triggered() {
-    EditorTab *tab = currentTab();
-    if(!tab) return;
-
-    tab->editor->clear(); // czyści widok
-    currentFilePath = QString();
-    this->setWindowTitle("Notatnik"); // ustawia nazwe okna na "Notatnik"
+    addTab(); // uprościłem kod nie ma sensu czyścić widoku lepiej po prostu dodać pustą karte
 }
 
 void MainWindow::on_saveFile_triggered() {
