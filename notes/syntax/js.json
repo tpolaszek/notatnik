@@ -1,0 +1,69 @@
+{
+  "name": "JavaScript",
+  "extensions": ["js"],
+  "rules": [
+    {
+      "name": "js_line_comment",
+      "pattern": "//.*",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "js_block_comment",
+      "pattern": "/\\*[\\s\\S]*?\\*/",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "js_string_double",
+      "pattern": "\"([^\"\\\\]|\\\\.)*\"",
+      "color": "#CE9178"
+    },
+    {
+      "name": "js_string_single",
+      "pattern": "'([^'\\\\]|\\\\.)*'",
+      "color": "#CE9178"
+    },
+    {
+      "name": "js_string_backtick",
+      "pattern": "`([^`\\\\]|\\\\.)*`",
+      "color": "#CE9178"
+    },
+    {
+      "name": "js_declaration_keywords",
+      "pattern": "\\b(const|let|var|function|class|extends|interface|export|import|from|as|default)\\b",
+      "color": "#569CD6",
+      "bold": true
+    },
+    {
+      "name": "js_control_keywords",
+      "pattern": "\\b(if|else|switch|case|break|continue|return|for|while|do|try|except|catch|finally|throw|new|delete|typeof|instanceof|void|in|of|await|async|yield)\\b",
+      "color": "#C586C0"
+    },
+    {
+      "name": "js_builtins_and_objects",
+      "pattern": "\\b(window|document|console|log|error|warn|alert|prompt|setTimeout|setInterval|clearTimeout|clearInterval|JSON|parse|stringify|Math|abs|max|min|floor|round|random|Date|Array|Object|String|Number|Boolean|RegExp|Map|Set|Promise|then|catch|finally)\\b",
+      "color": "#4FC1FF"
+    },
+    {
+      "name": "js_dom_methods",
+      "pattern": "\\b(getElementById|getElementsByClassName|getElementsByTagName|querySelector|querySelectorAll|addEventListener|removeEventListener|createElement|appendChild|removeChild|setAttribute|getAttribute|classList|add|remove|toggle)\\b",
+      "color": "#DCDCAA"
+    },
+    {
+      "name": "js_literals",
+      "pattern": "\\b(true|false|null|undefined|NaN|Infinity|this|super)\\b",
+      "color": "#569CD6"
+    },
+    {
+      "name": "js_number",
+      "pattern": "\\b\\d+(\\.\\d+)?\\b",
+      "color": "#B5CEA8"
+    },
+    {
+      "name": "js_function_call",
+      "pattern": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\()",
+      "color": "#DCDCAA"
+    }
+  ]
+}

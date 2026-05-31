@@ -1,0 +1,59 @@
+{
+  "name": "CSS",
+  "extensions": ["css"],
+  "rules": [
+    {
+      "name": "css_comment",
+      "pattern": "/\\*[\\s\\S]*?\\*/",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "css_id_selector",
+      "pattern": "#[a-zA-Z_][a-zA-Z0-9_-]*(?=\\s*[{,:\\s])",
+      "color": "#DCDCAA",
+      "bold": true
+    },
+    {
+      "name": "css_class_selector",
+      "pattern": "\\.[a-zA-Z_][a-zA-Z0-9_-]*(?=\\s*[{,:\\s])",
+      "color": "#DCDCAA"
+    },
+    {
+      "name": "css_tag_selector",
+      "pattern": "\\b(html|body|div|span|p|a|img|ul|li|ol|h1|h2|h3|h4|h5|h6|header|footer|section|nav|main|button|input|textarea|form|label)(?=\\s*[{,\\s])",
+      "color": "#4EC9B0"
+    },
+    {
+      "name": "css_property",
+      "pattern": "\\b(color|background|background-color|background-image|margin|margin-top|margin-right|margin-bottom|margin-left|padding|padding-top|padding-right|padding-bottom|padding-left|display|position|top|right|bottom|left|float|clear|width|height|max-width|max-height|min-width|min-height|border|border-radius|font-family|font-size|font-weight|text-align|text-decoration|justify-content|align-items|flex-direction|flex|grid-template-columns|opacity|box-shadow|transition|transform|cursor|z-index|box-sizing|overflow|visibility|animation)\\b(?=\\s*:)",
+      "color": "#9CDCFE"
+    },
+    {
+      "name": "css_value_unit",
+      "pattern": "\\b\\d+(px|em|rem|%|vh|vw|ms|s|deg|pt)\\b",
+      "color": "#B5CEA8"
+    },
+    {
+      "name": "css_value_hex",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b",
+      "color": "#CE9178"
+    },
+    {
+      "name": "css_important",
+      "pattern": "!important\\b",
+      "color": "#FF5D5D",
+      "bold": true
+    },
+    {
+      "name": "css_pseudo_class",
+      "pattern": ":(hover|active|focus|visited|link|first-child|last-child|nth-child\\([^\\)]*\\)|before|after|empty|disabled|checked)",
+      "color": "#C586C0"
+    },
+    {
+      "name": "css_string",
+      "pattern": "\"([^\"]*)\"|'([^']*)'",
+      "color": "#CE9178"
+    }
+  ]
+}
