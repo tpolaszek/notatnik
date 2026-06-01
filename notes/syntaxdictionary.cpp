@@ -73,6 +73,8 @@ void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *comp
 {
     if (!editor || !completer) return;
 
+    if (!completer->widget()) return;
+
     // ZAPAMIĘTUJEMY WSKAŹNIKI (Dopisujemy te dwie linijki na samym początku starej funkcji)
     currentEditor = editor;
     currentCompleter = completer;
@@ -96,10 +98,21 @@ void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *comp
     if (lastChar.contains(QRegularExpression("[a-zA-Z0-9]"))) {
 
         // Wyciągamy ostatnie słowo pisane przed kursosem
-        QString lastWord = textUpToCursor.split(QRegularExpression("\\s+")).last();
+        QString lastWord = textUpToCursor.split(QRegularExpression("[^a-zA-Z0-9_]")).last();
+
+        if (lastWord.isEmpty()) {
+            completer->popup()->hide();
+            return;
+        }
 
         // Czyścimy i ustawiamy prefix (to filtruje listę podpowiedzi)
         completer->setCompletionPrefix(lastWord);
+
+        if (completer->completionCount() == 0) {
+            completer->popup()->hide();
+            return;
+        }
+
 
         // Obliczamy pozycję dymka wewnątrz edytora tekstowego
         QRect cr = editor->cursorRect();
@@ -115,6 +128,6 @@ void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *comp
     }
     else {
         // Jeśli użytkownik kliknął spację, enter itp. - chowamy podpowiedzi
-        completer->popup()->hide();
+        if (completer->popup()->isVisible()) completer->popup()->hide();
     }
 }

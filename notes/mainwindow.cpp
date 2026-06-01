@@ -41,12 +41,14 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->setCornerWidget(viewMode, Qt::TopRightCorner);
     viewMode->setStyleSheet("QToolButton { border: none; border-radius: 4px; background: transparent; }" "QToolButton:hover { border-radius: 4px; }");
 
+    // Obsługa zmieniania trybów dla otwartej karty
     connect(viewMode, &QToolButton::clicked, this, [this, viewMode]() {
         EditorTab *tab = currentTab();
         if (!tab || !tab->editor || !tab->lineCounter) return;
 
         tab->isPreview = !tab->isPreview;
 
+        // przeładowanie ViewManagera dla editora
         if (!viewManager) {
             viewManager = new ViewManager(tab->editor, tab->lineCounter, this->statusBar(), this);
         } else {
@@ -54,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
             viewManager = new ViewManager(tab->editor, tab->lineCounter, this->statusBar(), this);
         }
 
+        // Zmiana trybu
         if (tab->isPreview) {
             viewManager->switchToPreview();
             viewMode->setIcon(QIcon(":/icons/edit.png"));
@@ -84,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    // Usuwa wszystkie zakreślacze składni
     for(EditorTab &tab : tabs) {
         delete tab.highlighter;
         tab.highlighter = nullptr;
@@ -104,6 +108,7 @@ EditorTab *MainWindow::currentTab(){
     return &tabs[ind];
 }
 
+// Twprzy karte
 int MainWindow::addTab(const QString &filePath){
     // budowanie edytora do każdej karty moim zdaniem lepsze rozwiązanie niż tworzenie .ui
     auto *container = new QWidget(); // tworzenie nowego obiektu QWidget
@@ -112,6 +117,7 @@ int MainWindow::addTab(const QString &filePath){
     hLayout->setSpacing(0);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
+    // Inicjalizuje licznik lini
     auto *lineCounter = new QPlainTextEdit(container);
     lineCounter->setReadOnly(true);
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -119,12 +125,14 @@ int MainWindow::addTab(const QString &filePath){
     lineCounter->setObjectName("lineCounter");
     lineCounter->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
+    // Inicjalizuje edytor
     auto *editor = new QPlainTextEdit(container);
     editor->setObjectName("noteText");
 
     hLayout->addWidget(lineCounter);
     hLayout->addWidget(editor, 1);
 
+    // Konfiguracja karty
     EditorTab tab;
     tab.editor = editor;
     tab.lineCounter = lineCounter;
@@ -135,11 +143,24 @@ int MainWindow::addTab(const QString &filePath){
     int ind = tabWidget->addTab(container, label);
     tabs.insert(ind, tab);
 
+    // Konfiguracja licznika linii
     TextTools::setupLineCounterUI(editor, lineCounter);
     ViewManager::setupBottomSpace(editor);
 
     connectEditorSignals(ind);
     tabWidget->setCurrentIndex(ind);
+
+    // Podpinanie autouzupełniania pod aktualny edytor
+    if (completer) {
+        completer->setWidget(editor);
+        disconnect(completer, nullptr, this, nullptr);
+        connect(completer, QOverload<const QString &>::of(&QCompleter::activated), editor, [this, editor](const QString &text) {
+            QTextCursor cursor = editor->textCursor();
+            cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, completer->completionPrefix().length());
+            cursor.insertText(text);
+            editor->setTextCursor(cursor);
+        });
+    }
 
     return ind;
 }
@@ -209,6 +230,15 @@ void MainWindow::onTabChange(int index){
     viewManager = new ViewManager(tab.editor, tab.lineCounter, this->statusBar());
     viewManager->setupEditorVisuals(tab.editor);
     completer->setWidget(tab.editor);
+
+    // Dołącza dane autouzupełnianie do danego okna
+    disconnect(completer, nullptr, this, nullptr);
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), tab.editor, [this, &tab](const QString &text) {
+        QTextCursor cursor = tab.editor->textCursor();
+        cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, completer->completionPrefix().length());
+        cursor.insertText(text);
+        tab.editor->setTextCursor(cursor);
+    });
     completer->popup()->installEventFilter(viewManager);
     viewManager->setCompleter(completer);
 
