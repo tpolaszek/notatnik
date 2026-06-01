@@ -83,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
     syntaxDict->updateLanguageForFile("default.cpp", completer);
 
     addTab(); // otworzenie pustej strony
+
+    onTabChange(0);
 }
 
 MainWindow::~MainWindow()
@@ -227,25 +229,33 @@ void MainWindow::onTabChange(int index){
     EditorTab &tab = tabs[index];
 
     delete viewManager;
-    viewManager = new ViewManager(tab.editor, tab.lineCounter, this->statusBar());
-    viewManager->setupEditorVisuals(tab.editor);
-    completer->setWidget(tab.editor);
+    viewManager = new ViewManager(tab.editor, tab.lineCounter, this->statusBar(), this);
 
-    // Dołącza dane autouzupełnianie do danego okna
-    disconnect(completer, nullptr, this, nullptr);
-    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), tab.editor, [this, &tab](const QString &text) {
-        QTextCursor cursor = tab.editor->textCursor();
+    // 1. Ustawiamy priorytet ViewManagera (Zakłada filtr jako OSTATNI, więc działa jako PIERWSZY na Tab)
+    completer->setWidget(tab.editor);
+    viewManager->setupEditorVisuals(tab.editor);
+
+    // 2. Absolutnie i bezwzględnie odcinamy completer od sygnałów do starych edytorów
+    completer->disconnect();
+
+    // 3. Bezpieczne przechwytywanie edytora (wskaźnik zamiast niebezpiecznej referencji &tab)
+    QPlainTextEdit *currentEditor = tab.editor;
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), currentEditor, [this, currentEditor](const QString &text) {
+        // Ta funkcja wykonuje się gdy completer (dymek) jest widoczny i wciśniesz Tab
+        QTextCursor cursor = currentEditor->textCursor();
         cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, completer->completionPrefix().length());
-        cursor.insertText(text);
-        tab.editor->setTextCursor(cursor);
+        cursor.insertText(text); // <--- TUTAJ tekst ląduje w edytorze
+        currentEditor->setTextCursor(cursor);
     });
+
+    // Kompleter nadal słucha dymka przez ten sam viewManager
     completer->popup()->installEventFilter(viewManager);
     viewManager->setCompleter(completer);
 
     QString base = tab.filePath.isEmpty() ? "Nowy plik" : QFileInfo(tab.filePath).fileName();
 
     bool mod = tab.editor->document()->isModified();
-    setTitle((mod ? "* " : "") + base); // jeśli plik nie jest zapisany to dodaje gwiazdke przed nazwą
+    setTitle((mod ? "* " : "") + base);
 
     viewManager->applyFontSize(settingsManager->fontSize());
 }
