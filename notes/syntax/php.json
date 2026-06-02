@@ -1,0 +1,60 @@
+{
+  "name": "PHP",
+  "extensions": ["php"],
+  "rules": [
+    {
+      "name": "php_tag",
+      "pattern": "<\\?php|\\?>",
+      "color": "#C586C0",
+      "bold": true
+    },
+    {
+      "name": "php_line_comment",
+      "pattern": "//.*|#.*",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "php_block_comment",
+      "pattern": "/\\*[\\s\\S]*?\\*/",
+      "color": "#6A9955",
+      "italic": true
+    },
+    {
+      "name": "php_variable",
+      "pattern": "\\$[a-zA-Z_][a-zA-Z0-9_]*",
+      "color": "#9CDCFE"
+    },
+    {
+      "name": "php_string_double",
+      "pattern": "\"([^\"\\\\]|\\\\.)*\"",
+      "color": "#CE9178"
+    },
+    {
+      "name": "php_string_single",
+      "pattern": "'([^'\\\\]|\\\\.)*'",
+      "color": "#CE9178"
+    },
+    {
+      "name": "php_keywords",
+      "pattern": "\\b(abstract|and|as|break|callable|case|catch|class|clone|const|continue|declare|default|do|echo|else|elseif|empty|enddeclare|endfor|endforeach|endif|endswitch|endwhile|eval|exit|extends|final|finally|for|foreach|function|global|goto|if|implements|include|include_once|instanceof|insteadof|interface|isset|list|namespace|new|or|print|private|protected|public|require|require_once|return|static|switch|throw|trait|try|unset|use|var|while|xor|yield)\\b",
+      "color": "#569CD6",
+      "bold": true
+    },
+    {
+      "name": "php_literals",
+      "pattern": "\\b(true|false|null)\\b",
+      "color": "#569CD6"
+    },
+    {
+      "name": "php_number",
+      "pattern": "\\b\\d+(\\.\\d+)?\\b",
+      "color": "#B5CEA8"
+    },
+    {
+      "name": "php_function_call",
+      "pattern": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\()",
+      "color": "#DCDCAA"
+    }
+  ]
+}

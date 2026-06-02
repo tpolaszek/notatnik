@@ -1,0 +1,8 @@
+{
+  "keywords": [
+    "array", "do", "echo", "elseif", "empty", "endforeach", "endif", 
+    "false", "foreach", "implements", "include", "include_once", "isset", 
+    "namespace", "php", "print", "private", "protected", "public", 
+    "require", "require_once", "static", "true", "unset", "use"
+  ]
+}

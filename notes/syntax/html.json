@@ -1,6 +1,7 @@
 {
   "name": "HTML",
   "extensions": ["html", "htm"],
+  "includes": ["css.json", "js.json", "php.json"],
   "rules": [
     {
       "name": "doctype",

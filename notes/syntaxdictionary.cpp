@@ -1,4 +1,5 @@
 #include "syntaxdictionary.h"
+#include "grammarloader.h"
 #include <QFileInfo>
 #include <QStringListModel>
 #include <QRegularExpression>
@@ -43,13 +44,16 @@ QStringList SyntaxDictionary::getKeywordsForFile(const QString &filePath)
     QJsonObject jsonObject = doc.object();
     QStringList words;
 
-    // Sprawdza, czy istnieje lista o nazwie "keywords" i przepisuje ją do pamięci programu
-    if (jsonObject.contains("keywords") && jsonObject["keywords"].isArray()) {
-        QJsonArray jsonArray = jsonObject["keywords"].toArray();
-        for (int i = 0; i < jsonArray.size(); ++i) {
-            words.append(jsonArray.at(i).toString());
-        }
+    // ====================================================================
+    // TUTAJ PODMIENIAMY: Zamiast starej pętli if, wywołujemy nasz automat
+    // ====================================================================
+    QJsonArray allKeywords = GrammarLoader::getMergedArray(jsonObject, ":/dictionary/dictionary/", "keywords");
+
+    // Przepisujemy wynik z QJsonArray do QStringList, którego oczekuje ta funkcja
+    for (const QJsonValue& val : allKeywords) {
+        words.append(val.toString());
     }
+    // ====================================================================
 
     // Zwraca gotową listę słów kluczowych do kompletera
     return words;
@@ -72,10 +76,9 @@ void SyntaxDictionary::updateLanguageForFile(const QString &filePath, QCompleter
 void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *completer)
 {
     if (!editor || !completer) return;
-
     if (!completer->widget()) return;
 
-    // ZAPAMIĘTUJEMY WSKAŹNIKI (Dopisujemy te dwie linijki na samym początku starej funkcji)
+    // Zapamiętujemy wskaźniki
     currentEditor = editor;
     currentCompleter = completer;
 
@@ -94,25 +97,25 @@ void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *comp
     // Sprawdzamy ostatni znak PRZED kursosem
     QString lastChar = textUpToCursor.right(1);
 
-    // Aktywujemy tylko dla liter i cyfr
-    if (lastChar.contains(QRegularExpression("[a-zA-Z0-9]"))) {
+    // POPRAWKA: Aktywujemy dymek również dla znaków specjalnych HTML (<, >, /)
+    if (lastChar.contains(QRegularExpression("[a-zA-Z0-9<>/]"))) {
 
-        // Wyciągamy ostatnie słowo pisane przed kursosem
-        QString lastWord = textUpToCursor.split(QRegularExpression("[^a-zA-Z0-9_]")).last();
+        // POPRAWKA: Rozbijamy tekst tak, aby znaki < > / _ NIE BYŁY separatorami.
+        // Dzięki temu gdy wpiszesz "<s", całe "<s" zostanie uznane za jedno słowo.
+        QString lastWord = textUpToCursor.split(QRegularExpression("[^a-zA-Z0-9_<>/]")).last();
 
         if (lastWord.isEmpty()) {
             completer->popup()->hide();
             return;
         }
 
-        // Czyścimy i ustawiamy prefix (to filtruje listę podpowiedzi)
+        // Ustawiamy prefix (teraz kompleter dostanie np. "<s" i idealnie przefiltruje tagi)
         completer->setCompletionPrefix(lastWord);
 
         if (completer->completionCount() == 0) {
             completer->popup()->hide();
             return;
         }
-
 
         // Obliczamy pozycję dymka wewnątrz edytora tekstowego
         QRect cr = editor->cursorRect();
@@ -123,7 +126,7 @@ void SyntaxDictionary::handleTextChange(QPlainTextEdit *editor, QCompleter *comp
         // Wymuszamy zaznaczenie pierwszego pasującego elementu na liście
         completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
 
-        // Najważniejsze: wywołujemy pokazanie dymka na ekranie
+        // Wywołujemy pokazanie dymka na ekranie
         completer->complete(cr);
     }
     else {

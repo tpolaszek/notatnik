@@ -11,6 +11,8 @@ public:
     void loadFromDirectory(const QString& dirPath);
     QJsonObject grammarForExtension(const QString& ext) const;
     QStringList availableLanguages() const;
+    static QJsonArray getMergedArray(const QJsonObject& baseJson, const QString& folderPath, const QString& keyName);
+
 
 private:
     QMap<QString, QJsonObject> extensionMap;

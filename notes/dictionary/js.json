@@ -1,0 +1,9 @@
+{
+  "keywords": [
+    "async", "await", "break", "case", "catch", "class", "console", 
+    "const", "continue", "default", "do", "else", "export", "extends", 
+    "finally", "for", "from", "function", "if", "import", "instanceof", 
+    "let", "log", "new", "null", "return", "super", "switch", "this", 
+    "throw", "try", "typeof", "undefined", "var", "while"
+  ]
+}

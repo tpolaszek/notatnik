@@ -1,7 +1,9 @@
 {
+  "includes": ["js.json", "css.json", "php.json"],
   "keywords": [
     "<html>", "</html>", "<head>", "</head>", "<body>", "</body>",
     "<div>", "</div>", "<p>", "</p>", "<span>", "</span>",
-    "<h1>", "</h1>", "<a>", "</a>", "img", "src", "href", "class", "id"
+    "<h1>", "</h1>", "<a>", "</a>", "<script>", "</script>", 
+    "<style>", "</style>", "img", "src", "href", "id"
   ]
 }

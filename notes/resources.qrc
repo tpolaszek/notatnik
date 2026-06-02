@@ -3,6 +3,9 @@
         <file>syntax/html.json</file>
         <file>syntax/cpp.json</file>
         <file>syntax/python.json</file>
+        <file>syntax/css.json</file>
+        <file>syntax/js.json</file>
+        <file>syntax/php.json</file>
     </qresource>
     <qresource prefix="/themes">
         <file alias="dark.css">themes/dark.css</file>
@@ -19,5 +22,8 @@
         <file>dictionary/cpp.json</file>
         <file>dictionary/html.json</file>
         <file>dictionary/py.json</file>
+        <file>dictionary/css.json</file>
+        <file>dictionary/js.json</file>
+        <file>dictionary/php.json</file>
     </qresource>
 </RCC>

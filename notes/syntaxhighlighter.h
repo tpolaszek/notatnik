@@ -21,7 +21,7 @@ protected:
     void highlightBlock(const QString& text) override;
 
 private:
-    QVector<HighlightRule> rules;
+    QList<HighlightRule> rules; // Twoja obecna lista reguł
 };
 
 #endif

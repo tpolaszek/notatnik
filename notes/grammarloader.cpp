@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QDebug>
 
 // Metoda wczytuje pliki zawierające instrukcje jak ma podkreślać składnie
 void GrammarLoader::loadFromDirectory(const QString& dirPath) {
@@ -34,6 +35,45 @@ void GrammarLoader::loadFromDirectory(const QString& dirPath) {
             extensionMap[ext.toString()] = grammar;
         }
     }
+}
+
+// ====================================================================
+// NOWA FUNKCJA POMOCNICZA (STATYCZNA): Odpowiada za scalanie JSON-ów
+// ====================================================================
+QJsonArray GrammarLoader::getMergedArray(const QJsonObject& baseJson, const QString& folderPath, const QString& keyName) {
+    QJsonArray combinedArray;
+
+    // 1. Sprawdzamy, czy plik bazowy żąda dołączenia innych plików przez "includes"
+    if (baseJson.contains("includes") && baseJson["includes"].isArray()) {
+        QJsonArray includes = baseJson["includes"].toArray();
+        for (const QJsonValue& incVal : includes) {
+            QString incFileName = incVal.toString(); // np. "js.json"
+            QFile file(folderPath + incFileName);     // np. ":/syntax/syntax/js.json"
+
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QJsonObject subJson = QJsonDocument::fromJson(file.readAll()).object();
+
+                // Jeśli pod-plik ma szukaną tablicę (np. "rules" lub "keywords"), kopiujemy jej elementy
+                if (subJson.contains(keyName) && subJson[keyName].isArray()) {
+                    QJsonArray subArray = subJson[keyName].toArray();
+                    for (const QJsonValue& item : subArray) {
+                        combinedArray.append(item);
+                    }
+                }
+                file.close();
+            }
+        }
+    }
+
+    // 2. Na koniec dorzucamy elementy z pliku głównego (np. html.json), żeby były na dole
+    if (baseJson.contains(keyName) && baseJson[keyName].isArray()) {
+        QJsonArray baseArray = baseJson[keyName].toArray();
+        for (const QJsonValue& item : baseArray) {
+            combinedArray.append(item);
+        }
+    }
+
+    return combinedArray;
 }
 
 // Zwracanie zasad kolorowania składni do danego rozszerzenia
