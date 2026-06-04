@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("Notatnik");
     setWindowIcon(QIcon(":/icons/note_icon.png"));
 
-    viewManager = nullptr; // dopiero inicjowanie zajdzie w innej metodzie ponieważ wymagane będzie aktualizowanie na bierząco
+    viewManager = nullptr; // dopiero inicjowanie zajdzie w innej metodzie ponieważ wymagane będzie aktualizowanie na bieżąco
 
     tabWidget = ui->tabWidget;
     tabWidget->setTabsClosable(true); // ustawia możliwość zamknięcia karty na true
@@ -110,7 +110,7 @@ EditorTab *MainWindow::currentTab(){
     return &tabs[ind];
 }
 
-// Twprzy karte
+// Tworzy kartę
 int MainWindow::addTab(const QString &filePath){
     // budowanie edytora do każdej karty moim zdaniem lepsze rozwiązanie niż tworzenie .ui
     auto *container = new QWidget(); // tworzenie nowego obiektu QWidget
@@ -119,7 +119,7 @@ int MainWindow::addTab(const QString &filePath){
     hLayout->setSpacing(0);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Inicjalizuje licznik lini
+    // Inicjalizuje licznik linii
     auto *lineCounter = new QPlainTextEdit(container);
     lineCounter->setReadOnly(true);
     lineCounter->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -176,7 +176,7 @@ void MainWindow::connectEditorSignals(int tabIndex){
         EditorTab &t = tabs[tabIndex];
         TextTools::updateLineCounter(t.editor, t.lineCounter);
 
-        // Autouzupełnianie
+        // Autouzupełnianie (nawiasy)
         if(syntaxDict && completer) syntaxDict->handleTextChange(t.editor, completer);
     });
 

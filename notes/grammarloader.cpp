@@ -46,6 +46,8 @@ QJsonArray GrammarLoader::getMergedArray(const QJsonObject& baseJson, const QStr
     // 1. Sprawdzamy, czy plik bazowy żąda dołączenia innych plików przez "includes"
     if (baseJson.contains("includes") && baseJson["includes"].isArray()) {
         QJsonArray includes = baseJson["includes"].toArray();
+
+        // PĘTLA 1: Przechodzimy po kolei przez każdy dopisany plik (np. js.json, css.json)
         for (const QJsonValue& incVal : includes) {
             QString incFileName = incVal.toString(); // np. "js.json"
             QFile file(folderPath + incFileName);     // np. ":/syntax/syntax/js.json"
@@ -53,9 +55,10 @@ QJsonArray GrammarLoader::getMergedArray(const QJsonObject& baseJson, const QStr
             if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 QJsonObject subJson = QJsonDocument::fromJson(file.readAll()).object();
 
-                // Jeśli pod-plik ma szukaną tablicę (np. "rules" lub "keywords"), kopiujemy jej elementy
+                // Jeśli wywołuje się słownik to mamy keywords, a jeśli kolorki to mamy rules
                 if (subJson.contains(keyName) && subJson[keyName].isArray()) {
                     QJsonArray subArray = subJson[keyName].toArray();
+                    // PĘTLA 2: Przepisujemy każdy pojedynczy element z pod-pliku do naszego wspólnego worka
                     for (const QJsonValue& item : subArray) {
                         combinedArray.append(item);
                     }
@@ -68,6 +71,7 @@ QJsonArray GrammarLoader::getMergedArray(const QJsonObject& baseJson, const QStr
     // 2. Na koniec dorzucamy elementy z pliku głównego (np. html.json), żeby były na dole
     if (baseJson.contains(keyName) && baseJson[keyName].isArray()) {
         QJsonArray baseArray = baseJson[keyName].toArray();
+        // PĘTLA 3: Przepisujemy elementy z pliku głównego na sam koniec naszej listy
         for (const QJsonValue& item : baseArray) {
             combinedArray.append(item);
         }

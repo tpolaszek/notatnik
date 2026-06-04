@@ -1,4 +1,4 @@
-    #include "texttools.h"
+#include "texttools.h"
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QInputDialog>

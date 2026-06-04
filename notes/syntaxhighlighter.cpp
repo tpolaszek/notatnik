@@ -8,7 +8,7 @@
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
     : QSyntaxHighlighter(parent) {}
 
-// Główna metoda ładowania zasad z pliku JSON
+// Główna metoda ładowania zasad z pliku JSON -> (Przygotowanie zasad)
 void SyntaxHighlighter::loadFromJson(const QJsonObject& grammar){
     rules.clear(); // Resetujemy stare reguły kolorowania
 
@@ -28,11 +28,13 @@ void SyntaxHighlighter::loadFromJson(const QJsonObject& grammar){
         if(ruleObj["italic"].toBool()) fmt.setFontItalic(true);
 
         rule.format = fmt;
+
+        // ZAPIS: Wrzucamy przygotowaną regułę do wspólnego kontenera klasy, by zapisać ją w pamięci
         rules.append(rule);
     }
 }
 
-// Metoda podkreśla składnię (Bez zmian)
+// Metoda podkreśla składnię (Wykorzystanie zasad w praktyce)
 void SyntaxHighlighter::highlightBlock(const QString& text){
     for(const HighlightRule & rule : rules){
         QRegularExpressionMatchIterator it = rule.pattern.globalMatch(text);
