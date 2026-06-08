@@ -101,7 +101,9 @@ bool ViewManager::eventFilter(QObject *obj, QEvent *event) {
         if (isPopupActive) {
             if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
 
-                QString currentCompletion = m_completer->currentCompletion();
+                QModelIndex idx = m_completer->popup()->currentIndex();
+                QString currentCompletion = m_completer->completionModel()->data(idx).toString();
+                if (currentCompletion.isEmpty()) currentCompletion = m_completer->currentCompletion();
                 emit m_completer->activated(currentCompletion);
 
                 m_completer->popup()->hide();

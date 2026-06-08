@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QToolButton>
 #include <QIcon>
+#include "aboutdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -248,6 +249,8 @@ void MainWindow::onTabChange(int index){
         currentEditor->setTextCursor(cursor);
     });
 
+    if(syntaxDict && completer) syntaxDict->updateLanguageForFile(tab.filePath, completer);
+
     // Kompleter nadal słucha dymka przez ten sam viewManager
     completer->popup()->installEventFilter(viewManager);
     viewManager->setCompleter(completer);
@@ -480,3 +483,9 @@ bool MainWindow::proceedWithSafetyCheck(int tabIndex) {
     // 3. Jeśli Cancel - zwracamy false (nie idź dalej). Jeśli Discard - true (idź dalej).
     return (result != FileHandling::SaveResult::CancelAction);
 }
+
+void MainWindow::on_about_triggered() {
+    AboutDialog dlg(this);
+    dlg.exec();
+}
+

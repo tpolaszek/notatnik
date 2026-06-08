@@ -93,9 +93,16 @@
     <addaction name="Find"/>
     <addaction name="FindAndReplace"/>
    </widget>
+   <widget class="QMenu" name="menuPomoc">
+    <property name="title">
+     <string>Pomoc</string>
+    </property>
+    <addaction name="about"/>
+   </widget>
    <addaction name="menuOtw_rz_plik"/>
    <addaction name="menuUstawienia"/>
    <addaction name="menuNarz_dzia"/>
+   <addaction name="menuPomoc"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openFile">
@@ -180,6 +187,11 @@
    </property>
    <property name="toolTip">
     <string>Edit</string>
+   </property>
+  </action>
+  <action name="about">
+   <property name="text">
+    <string>O Notatniku</string>
    </property>
   </action>
  </widget>

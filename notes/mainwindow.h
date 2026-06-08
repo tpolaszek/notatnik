@@ -57,6 +57,8 @@ private slots:
     bool proceedWithSafetyCheck(int tabIndex);
 
 
+    void on_about_triggered();
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 

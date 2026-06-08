@@ -111,7 +111,8 @@ void SettingsDialog::onApplyClicked() {
         viewManager->applyFontSize(newSize);
     }
 }
-// Po kliknięciu OK zamyka okno bez zapisywania zmian
+// Po kliknięciu OK zamyka okno i zapisuje zmiany
 void SettingsDialog::onOkClicked() {
+    onApplyClicked();
     accept();
 }
